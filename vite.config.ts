@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import {VitePWA} from "vite-plugin-pwa";
+import { VitePWA } from "vite-plugin-pwa";
 
-export default defineConfig({  
-  plugins: [    
-    react(),
-    tailwindcss(),
-    VitePWA({
+export default defineConfig({
+	plugins: [
+		react(),
+		tailwindcss(),
+		VitePWA({
 			registerType: 'autoUpdate', // Activar Servicew worker
 			includeAssets: ['favicon.svg', 'robots.txt'],
 			workbox: { // Carga elementos sin conexión
@@ -15,14 +15,41 @@ export default defineConfig({
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg}'] // Archivos cacheados
 			},
 			manifest: {
-				name: 'App React',
-				short_name: 'React',
-				description: 'App React+Vite PWA',
+				name: 'Meniu QR',
+				short_name: 'Meniu',
+				description: 'App Meniu PWA',
 				start_url: '/',
 				display: 'standalone', // Habilitar instalación en dispositivos
 				background_color: '#ffffff',
-				theme_color: '#228be6'
-      }
+				theme_color: '#228be6',
+				screenshots: [
+					{
+						src: '/screenshots/logo1.png',
+						type: 'image/png',
+						sizes: '320x320',
+						form_factor: 'wide'
+					},
+					{
+						src: '/screenshots/logo2.png',
+						type: 'image/png',
+						sizes: '320x320',
+						form_factor: 'wide'
+					}
+				],
+				icons: [
+					{
+						src: './icons/logo1.png',
+						sizes: '320x320',
+						type: 'image/png',
+					},
+					{
+						src: '/icons/logo2.png',
+						sizes: '320x320',
+						type: 'image/png',
+					}]
+
+
+			}
 		})
-  ],
+	],
 })
