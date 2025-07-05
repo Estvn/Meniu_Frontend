@@ -15,7 +15,7 @@ export default defineConfig({
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg}'] // Archivos cacheados
 			},
 			manifest: {
-				name: 'Meniu QR',
+				name: 'Meniu',
 				short_name: 'Meniu',
 				description: 'App Meniu PWA',
 				start_url: '/',
@@ -28,22 +28,11 @@ export default defineConfig({
 						type: 'image/png',
 						sizes: '320x320',
 						form_factor: 'wide'
-					},
-					{
-						src: '/screenshots/logo2.png',
-						type: 'image/png',
-						sizes: '320x320',
-						form_factor: 'wide'
 					}
 				],
 				icons: [
 					{
 						src: './icons/logo1.png',
-						sizes: '320x320',
-						type: 'image/png',
-					},
-					{
-						src: '/icons/logo2.png',
 						sizes: '320x320',
 						type: 'image/png',
 					}]
