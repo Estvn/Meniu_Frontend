@@ -1,10 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './assets/css/global.css'
-import GenericComponent from './components/GenericComponent.tsx'
+import './assets/css/menu.css'
+
+import ClienteMenu from './components/cliente/ClienteMenu.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GenericComponent />
+    <ClienteMenu />
   </StrictMode>,
 )
