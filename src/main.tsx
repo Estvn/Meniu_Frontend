@@ -1,10 +1,17 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+
 import './assets/css/global.css'
-import GenericComponent from './components/GenericComponent.tsx'
+import Login from './components/Login.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GenericComponent />
+    <BrowserRouter>
+      <Routes>
+        <Route path = "/" element = {<Login/>}></Route>
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 )
+

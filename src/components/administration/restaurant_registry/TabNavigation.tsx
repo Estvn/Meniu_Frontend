@@ -8,7 +8,7 @@ interface TabNavigationProps {
 }
 
 function TabNavigation({
-  activeTab: propActiveTab = "register",
+  activeTab: propActiveTab = "login",
   onTabChange,
 }: TabNavigationProps) {
   const [internalActiveTab, setInternalActiveTab] = useState<"login" | "register">(propActiveTab);
@@ -25,7 +25,7 @@ function TabNavigation({
   };
 
   return (
-    <div className="w-full flex justify-center px-4 sm:px-0">
+    <div className="w-full flex justify-center px-4">
       <div
         className="box-border inline-flex gap-1 sm:gap-2 justify-end items-center py-1 px-1 h-8 sm:h-10 rounded-md bg-zinc-100 w-full max-w-[303px] min-w-[280px] transition-colors duration-300"
         role="tablist"

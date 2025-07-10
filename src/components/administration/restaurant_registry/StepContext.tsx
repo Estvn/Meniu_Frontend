@@ -5,6 +5,7 @@ interface StepContextType {
     step: number;
     nextStep: () => void;
     prevStep: () => void;
+    resetStep: () => void;
     handleStepTransition: (nextStepFunction: () => void) => void;
     isTransitioning: boolean;
 }
@@ -23,6 +24,7 @@ export const StepProvider = ({ children }: { children: React.ReactNode }) => {
     
     const nextStep = () => setStep((prev) => prev + 1);
     const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
+    const resetStep = () => setStep(0);
 
     const handleStepTransition = async (nextStepFunction: () => void) => {
         setIsTransitioning(true);
@@ -33,7 +35,7 @@ export const StepProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <StepContext.Provider value={{ step, nextStep, prevStep, handleStepTransition, isTransitioning }}>
+        <StepContext.Provider value={{ step, nextStep, prevStep, resetStep, handleStepTransition, isTransitioning }}>
             {children}
         </StepContext.Provider>
     );

@@ -238,7 +238,7 @@ export default function FormRegistry() {
                         type="password"
                         validation={{
                             required: "Requerido",
-                            minLength: { value: 6, message: "6+ caracteres" },
+                            minLength: { value: 8, message: "8+ caracteres" },
                         }}
                         />
                         <InputField
