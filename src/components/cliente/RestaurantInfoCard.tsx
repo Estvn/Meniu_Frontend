@@ -1,9 +1,9 @@
 import { Clock, MapPin } from "lucide-react";
 
-export default function RestaurantInfoCard() {
+export function RestaurantInfo() {
   return (
     <>
-      {/* Hero Image Placeholder */}
+      {/* Restaurant Hero Image Placeholder */}
       <div className="h-48 bg-gray-300 relative overflow-hidden">
         <div className="absolute inset-0 bg-gray-400 flex items-center justify-center">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
@@ -12,8 +12,8 @@ export default function RestaurantInfoCard() {
         </div>
       </div>
 
-      {/* Info Card */}
-      <div className="mx-4 -mt-16 relative z-10">
+      {/* Restaurant Info Card */}
+      <div className="mx-4 -mt-10 relative z-10">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-black mb-4">La Trattoria</h1>
 

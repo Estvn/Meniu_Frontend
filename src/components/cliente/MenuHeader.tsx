@@ -1,14 +1,15 @@
-import { CreditCard, ShoppingCart } from "lucide-react";
+import { ShoppingCart, CreditCard } from "lucide-react";
+import Logo from "../../../public/img/logoHorizontal.png";
 
-interface MenuHeaderProps {
+interface HeaderProps {
   totalItems: number;
 }
 
-export default function MenuHeader({ totalItems }: MenuHeaderProps) {
+export function Header({ totalItems }: HeaderProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 w-full bg-white shadow-sm px-4 py-3 flex items-center justify-between z-50 max-w-screen overflow-hidden">
-      <div className="flex items-center gap-2">
-        <span className="text-xl font-bold text-gray-900">Meniu</span>
+    <header className="fixed top-0 left-0 right-0 bg-white shadow-sm px-4 py-3 flex items-center justify-between z-50">
+      <div className="flex items-center">
+      <img src={Logo} alt="Logo" className="w-25 h-10 object-contain" />
       </div>
 
       <div className="flex items-center gap-3">

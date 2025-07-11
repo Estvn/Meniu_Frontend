@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './assets/css/global.css'
 import './assets/css/menu.css'
 
-import ClienteMenu from './components/cliente/ClienteMenu.tsx'
+import ClienteMenu from './pages/cliente/ClienteMenu.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
