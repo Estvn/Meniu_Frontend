@@ -9,7 +9,7 @@ interface LayoutLoginFormProps {
 function LayoutLoginForm({ BackButtonComponent, TabNavigationComponent, FormComponent }: LayoutLoginFormProps) {
   return (
     <main >
-      <div className="flex flex-col items-start w-full max-w-[412px] gap-2 xs:pt-4 sm:gap-3 md:gap-3 lg:gap-3 pt-4 sm:pt-8 md:pt-14 lg:pt-16 xl:pt-22 2xl:pt-28 pb-4 sm:pb-6 md:pb-10 lg:pb-24 xl:pb-44 2xl:pb-52">
+      <div className="flex flex-col items-start w-full max-w-[412px] gap-2 xs:pt-4 sm:gap-3 md:gap-3 lg:gap-3 pt-4 sm:pt-8 md:pt-14 lg:pt-16 xl:pt-16 2xl:pt-18 pb-4 sm:pb-6 md:pb-10 lg:pb-24 xl:pb-44 2xl:pb-52">
         
         {BackButtonComponent}
         

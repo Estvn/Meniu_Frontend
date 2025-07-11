@@ -5,21 +5,42 @@ import LayoutLoginForm from "../layouts/LayoutLoginForm";
 import FormRegistry from "./administration/restaurant_registry/FormRegistry";
 import FormLogin from "./administration/restaurant_registry/FormLogin";
 import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function LoginContent() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const { resetStep } = useStepContext();
   const prevTabRef = useRef(activeTab);
 
+  // Determinar el tab activo basado en la URL
+  useEffect(() => {
+    const currentTab = location.pathname === "/registro" ? "register" : "login";
+    setActiveTab(currentTab);
+  }, [location.pathname]);
+
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
       resetStep();
+      // Limpiar datos del formulario anterior
+      if (prevTabRef.current === "login") {
+        localStorage.removeItem('login-form-data');
+      } else {
+        localStorage.removeItem('registry-form-data');
+      }
       prevTabRef.current = activeTab;
     }
   }, [activeTab, resetStep]);
 
   const handleTabChange = (tab: "login" | "register") => {
     setActiveTab(tab);
+    // Navegar a la ruta correspondiente
+    if (tab === "register") {
+      navigate("/registro");
+    } else {
+      navigate("/");
+    }
   };
 
   return (

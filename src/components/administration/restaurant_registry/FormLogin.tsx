@@ -3,6 +3,7 @@
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import ButtonNext from "./ButtonNext";
+import { useFormPersistence } from "../../../hooks/useFormPersistence";
 
 interface FormValues {
     userOrEmail: string;
@@ -43,9 +44,16 @@ export default function FormLogin() {
 
     const methods = useForm<FormValues>({ mode: "onSubmit" });
     const { handleSubmit } = methods;
+    
+    // Usar persistencia para el formulario de login
+    const { clearPersistedData } = useFormPersistence(methods, {
+        key: 'login-form-data'
+    });
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         console.log("Form Data:", data);
+        // Limpiar datos guardados después del envío exitoso
+        clearPersistedData();
     };
 
     return (

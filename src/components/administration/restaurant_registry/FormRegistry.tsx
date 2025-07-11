@@ -4,6 +4,7 @@ import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useStepContext } from "./StepContext"; 
 import ButtonNext from "./ButtonNext";
+import { useFormPersistence } from "../../../hooks/useFormPersistence";
 
 interface FormValues {
     firstName: string;
@@ -58,11 +59,19 @@ export default function FormRegistry() {
 
     const methods = useForm<FormValues>({ mode: "onSubmit" });
     const { handleSubmit, trigger, formState: { errors, touchedFields }, getValues, } = methods;
-    const { step, nextStep, handleStepTransition, isTransitioning } = useStepContext();
+    const { step, nextStep, handleStepTransition, isTransitioning, resetStep } = useStepContext();
     const steps = ["PersonalInfo", "RestaurantInfo", "Subscription", "Payment", "Password",];
+
+    // Usar persistencia para el formulario de registro
+    const { clearPersistedData } = useFormPersistence(methods, {
+        key: 'registry-form-data'
+    });
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         console.log("Final Data:", data);
+        // Limpiar datos guardados y resetear el paso después del envío exitoso
+        clearPersistedData();
+        resetStep();
     };
 
     const handleNext = async () => {
@@ -167,18 +176,16 @@ export default function FormRegistry() {
                             { value: "premium", label: "Plan Meniu - L. 700" },
                         ].map((plan) => (
                             <button
-                            key={plan.value}
-                            type="button"
-                            onClick={() =>
-                                methods.setValue("subscriptionPlan", plan.value)
-                            }
-                            className={`w-full py-3 px-4 text-center rounded-md bg-orange-500 bg-opacity-70 text-white text-sm sm:text-base font-medium transition-all duration-200 hover:bg-opacity-80 ${
-                                getValues("subscriptionPlan") === plan.value
-                                ? "ring-2 ring-orange-500 bg-opacity-90"
-                                : ""
-                            }`}
-                            >
-                            {plan.label}
+                                key={plan.value}
+                                type="button"
+                                onClick={() => methods.setValue("subscriptionPlan", plan.value)}
+                                className={`w-full py-3 px-4 text-center rounded-md text-white text-sm sm:text-base font-medium transition-all duration-200
+                                    ${getValues("subscriptionPlan") === plan.value
+                                    ? "bg-orange-50 text-orange-700 ring-2 ring-orange-500"
+                                    : "bg-orange-400 bg-opacity-70 hover:bg-opacity-80"}
+                                `}
+                                >
+                                {plan.label}
                             </button>
                         ))}
                         </div>
