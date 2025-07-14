@@ -1,7 +1,7 @@
 import type { MenuCategories } from "./shared/restaurant-types";
 
 export const menuCategories: MenuCategories = {
-  Alimentos: [
+  Comidas: [
     {
       name: "Pastas",
       items: [

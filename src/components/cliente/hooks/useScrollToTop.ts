@@ -1,3 +1,5 @@
+//Proporciona la funcionalidad para desplazarse hacia la parte superior de la pagina
+
 import { useState, useEffect } from "react";
 
 export function useScrollToTop() {

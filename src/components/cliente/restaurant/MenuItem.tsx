@@ -1,4 +1,10 @@
-import { type MenuItem as MenuItemType } from "./shared/restaurant-types";
+//Componente para mostrar informacion de un producto del menu del restaurante
+
+import { type MenuItem as MenuItemType } from "../shared/restaurant-types.ts";
+
+// MenuItemType define el tipo de un producto del menu que es MenuItem
+// onDetailsClick es una funcion que se ejecuta al hacer click en el boton de agregar
+// toFixed(2) se usa para mostrar el precio con dos decimales
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -14,7 +20,7 @@ export function MenuItem({ item, onDetailsClick }: MenuItemProps) {
           <div className="flex justify-between items-start mb-2">
             <h3 className="font-semibold text-gray-900">{item.name}</h3>
             <span className="text-orange-600 font-bold">
-              L{item.price.toFixed(2)}
+              L{item.price.toFixed(2)} 
             </span>
           </div>
           <p className="text-gray-600 text-sm mb-3">{item.description}</p>

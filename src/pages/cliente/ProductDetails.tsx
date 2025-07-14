@@ -1,6 +1,9 @@
+//Pagina para detalles de productos en la vista del cliente osea seccion de complementos, etc
+
 import { useState, useEffect } from "react";
 import { ArrowLeft, Minus, Plus } from "lucide-react";
-import type { MenuItem, Complement } from "../../components/cliente/shared/restaurant-types";
+import type { MenuItem, Complement } from "../../components/cliente/shared/restaurant-types.ts";
+import { toast } from "sonner";
 
 interface ProductDetailPageProps {
   item: MenuItem;
@@ -31,6 +34,8 @@ export default function ProductDetailPage({
     },
   ]);
 
+
+  // FUncion que Permite alterar el estado selected de un complemento especfico
   const toggleComplement = (complementId: string) => {
     setComplements((prev) =>
       prev.map((comp) =>
@@ -39,6 +44,7 @@ export default function ProductDetailPage({
     );
   };
 
+  // Calculo del total del precio del producto con complementos y cantidad
   const selectedComplements = complements.filter((comp) => comp.selected);
   const complementsTotal = selectedComplements.reduce(
     (sum, comp) => sum + comp.price,
@@ -46,12 +52,25 @@ export default function ProductDetailPage({
   );
   const totalPrice = (item.price + complementsTotal) * quantity;
 
+
+  // Maneja la accion de agregar el producto al carrito
   const handleAddToCart = () => {
     onAddToCart(item, selectedComplements, instructions, quantity);
+
+    toast("Producto agregado al carrito", {
+      description: `${item.name} x${quantity}`,
+      duration: 3000,
+      style: {
+        backgroundColor: "#fb3260",
+        color: "white",
+        fontWeight: "500",
+      },
+    });
+
     onBack();
   };
 
-  // Scroll to top when component mounts
+  // Asegura que la pagina se desplace al inicio al cargar
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -110,11 +129,10 @@ export default function ProductDetailPage({
                   </div>
                   <button
                     onClick={() => toggleComplement(complement.id)}
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      complement.selected
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${complement.selected
                         ? "border-orange-500 bg-orange-500"
                         : "border-orange-500 bg-white"
-                    }`}
+                      }`}
                   >
                     {complement.selected && (
                       <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -127,7 +145,7 @@ export default function ProductDetailPage({
         </div>
 
         {/* Special instructions */}
-        <div className="mx-4 mt-6">
+        <div className="mx-4 mt-6 mb-8">
           <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Instrucciones Especiales

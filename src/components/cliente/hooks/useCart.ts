@@ -1,8 +1,17 @@
-import { useState } from "react";
-import type { MenuItem, Complement, CartItem } from "../shared/restaurant-types";
+import { useState, useEffect } from "react";
+import type { MenuItem, Complement, CartItem } from "../shared/restaurant-types.ts";
 
 export function useCart() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // Recuperar carrito al iniciar
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const stored = localStorage.getItem("cart");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Guardar carrito en localStorage cuando cambia
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (
     item: MenuItem,
@@ -16,16 +25,24 @@ export function useCart() {
     );
     const totalPrice = item.price + complementsTotal;
 
+    // ID único para diferenciar productos con complementos/instrucciones diferentes
+    const complementIds = complements
+      .map((comp) => comp.id)
+      .sort()
+      .join(",");
+    const uniqueId = `${item.id}-${complementIds}-${instructions}`;
+
     const cartItem: CartItem = {
       ...item,
+      id: uniqueId,
       price: totalPrice,
-      quantity: quantity,
+      quantity,
       complements,
       instructions,
     };
 
     const existingItemIndex = cart.findIndex(
-      (cartItem) => cartItem.id === item.id,
+      (cartItem) => cartItem.id === uniqueId,
     );
 
     if (existingItemIndex !== -1) {
@@ -58,13 +75,16 @@ export function useCart() {
 
   const clearCart = () => {
     setCart([]);
+    localStorage.removeItem("cart"); // limpiar también el storage
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce(
+  const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+  const isv = subtotal * 0.15;
+  const totalPrice = subtotal + isv;
 
   return {
     cart,

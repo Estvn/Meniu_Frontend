@@ -1,4 +1,9 @@
+//Proporciona boton flotante
+
 import { ArrowUp } from "lucide-react";
+
+//isVisible: Indica si el botón debe ser visible
+// onClick: Función que se ejecuta al hacer clic en el botón
 
 interface ScrollToTopProps {
   isVisible: boolean;

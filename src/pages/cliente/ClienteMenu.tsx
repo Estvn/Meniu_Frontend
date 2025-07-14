@@ -4,16 +4,18 @@ import { useCart } from "../../components/cliente/hooks/useCart";
 import { useMenuNavigation } from "../../components/cliente/hooks/useMenuNavigation";
 import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop";
 import { menuCategories } from "../../components/cliente/menuData";
-import { Header } from "../../components/cliente/MenuHeader";
-import { RestaurantInfo } from "../../components/cliente/RestaurantInfoCard";
-import { MenuNavigation } from "../../components/cliente/MenuNavigation";
-import { CategoryNavigation } from "../../components/cliente/CategoryNavigation";
-import { MenuGrid } from "../../components/cliente/MenuGrid";
-import { ScrollToTop } from "../../components/cliente/ScrollToTop";
+import { Header } from "../../components/cliente/restaurant/MenuHeader";
+import { RestaurantInfo } from "../../components/cliente/restaurant/RestaurantInfoCard";
+import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation";
+import { CategoryNavigation } from "../../components/cliente/restaurant/CategoryNavigation";
+import { MenuGrid } from "../../components/cliente/restaurant/MenuGrid";
+import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop";
 import ProductDetailPage from "./ProductDetails";
 
 export default function ClienteMenu() {
+  // SelectItem almacena el producto actualmente seleccionado
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  // CurrentView controla la vista actual (menú o detalle del producto)
   const [currentView, setCurrentView] = useState<ViewType>("menu");
 
   const { addToCart, totalItems } = useCart();
@@ -21,24 +23,24 @@ export default function ClienteMenu() {
   const {
     activeCategory,
     activeSubCategory,
-    openDropdown,
     handleCategoryClick,
     handleSubCategoryClick,
-    setOpenDropdown,
     getCurrentItems,
   } = useMenuNavigation(menuCategories);
 
+  // Se activa cuando el usuario hace clic en un elemento del menú y cambia la vista a producDetail
   const handleItemClick = (item: MenuItem) => {
     setSelectedItem(item);
     setCurrentView("productDetail");
   };
 
+  // Permite regresar a la vista del menu
   const handleBackFromDetail = () => {
     setSelectedItem(null);
     setCurrentView("menu");
   };
 
-  // Show product detail page
+  // Si la vista actual es productDetail y hay un elemento seleccionado, renderiza la página de detalles del producto
   if (currentView === "productDetail" && selectedItem) {
     return (
       <ProductDetailPage
@@ -54,7 +56,8 @@ export default function ClienteMenu() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <Header totalItems={totalItems} />
+      {/* Header con el total de items en el carrito */}
+      <Header totalItems={totalItems} /> 
       <RestaurantInfo />
       <MenuNavigation />
 
@@ -62,12 +65,11 @@ export default function ClienteMenu() {
         menuCategories={menuCategories}
         activeCategory={activeCategory}
         activeSubCategory={activeSubCategory}
-        openDropdown={openDropdown}
         onCategoryClick={handleCategoryClick}
         onSubCategoryClick={handleSubCategoryClick}
-        onCloseDropdown={() => setOpenDropdown(null)}
       />
 
+      {/* Muestra los items del menú según la categoría y subcategoría activa */}
       <MenuGrid
         items={getCurrentItems()}
         activeCategory={activeCategory}
@@ -75,6 +77,7 @@ export default function ClienteMenu() {
         onItemClick={handleItemClick}
       />
 
+      {/*Permite al usuario desplazarse hacia la parte superior de la pagina */}
       <ScrollToTop isVisible={showScrollTop} onClick={scrollToTop} />
     </div>
   );

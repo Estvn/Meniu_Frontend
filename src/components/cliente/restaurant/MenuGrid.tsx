@@ -1,5 +1,7 @@
+//Componente para mostrar la lista de los productos del menu del restaurante
+
 import { MenuItem as MenuItemComponent } from "./MenuItem";
-import { type MenuItem as MenuItemType } from "./shared/restaurant-types";
+import { type MenuItem as MenuItemType } from "../shared/restaurant-types.ts";
 
 
 interface MenuGridProps {
@@ -17,7 +19,7 @@ export function MenuGrid({
 }: MenuGridProps) {
   return (
     <>
-      {/* Current Category/SubCategory Title */}
+      {/* Titulo de la categoria activa y subcategoria */}
       <div className="mt-6 px-4">
         <h2 className="text-xl font-bold text-gray-900">
           {activeCategory}
@@ -30,7 +32,7 @@ export function MenuGrid({
         </h2>
       </div>
 
-      {/* Menu Items */}
+      {/* Menu Items. map para iterar entre items y generando un MenuItemComponent para cada producto */}
       <div className="mt-4 px-4 pb-6">
         <div className="space-y-4">
           {items.map((item) => (

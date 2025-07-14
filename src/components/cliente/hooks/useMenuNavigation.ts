@@ -1,8 +1,10 @@
+// Maneja la navegacion entre categorias y subcayegorias del menu
+
 import { useState } from "react";
-import type { MenuItem, MenuCategories } from "../shared/restaurant-types";
+import type { MenuItem, MenuCategories } from "../shared/restaurant-types.ts";
 
 export function useMenuNavigation(menuCategories: MenuCategories) {
-  const [activeCategory, setActiveCategory] = useState("Alimentos");
+  const [activeCategory, setActiveCategory] = useState("Comidas");
   const [activeSubCategory, setActiveSubCategory] = useState("Ver todo");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
