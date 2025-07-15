@@ -1,6 +1,6 @@
 "use client";
-import { Header } from "./Header";
-import { SearchBar } from "./SearchBar";
+import { HeaderNavBar } from "../navbar/HeaderNavBar";
+import { SearchSection } from "./SearchSection";
 import { StatsSection } from "./StatsSection";
 import { TablesList } from "./TablesList";
 
@@ -30,18 +30,19 @@ export const MesasGerente = ({
   onDeleteTable,
   onViewQR,
 }: MesasGerenteProps) => {
+  const handleSearch = (query: string) => {
+    console.log("Searching for:", query);
+  };
+
   return (
-    <main className="relative bg-gray-50 min-h-screen w-full">
-      <div className="flex flex-col w-full">
-        <Header title="Mesas" subtitle="Gestión de Mesa" />
-        
-        <SearchBar placeholder="Buscar mesa..." />
-        
+    <main className="min-h-screen bg-gray-50 flex flex-col">
+      <HeaderNavBar title="Mesas" subtitle="Gestión de Mesa" />
+      <div className="flex-1 flex flex-col pt-16 sm:pt-18 md:pt-20">
+        <SearchSection onSearch={handleSearch} />
         <StatsSection
           totalTables={tables.length}
           onRegisterNewTable={onRegisterNewTable}
         />
-        
         <TablesList
           tables={tables}
           onEditTable={onEditTable}

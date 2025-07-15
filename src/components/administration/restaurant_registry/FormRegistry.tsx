@@ -181,8 +181,8 @@ export default function FormRegistry() {
                                 onClick={() => methods.setValue("subscriptionPlan", plan.value)}
                                 className={`w-full py-3 px-4 text-center rounded-md text-white text-sm sm:text-base font-medium transition-all duration-200
                                     ${getValues("subscriptionPlan") === plan.value
-                                    ? "bg-orange-50 text-orange-700 ring-2 ring-orange-500"
-                                    : "bg-orange-400 bg-opacity-70 hover:bg-opacity-80"}
+                                    ? "bg-orange-500 text-white"
+                                    : "bg-orange-300 bg-opacity-70 hover:bg-opacity-80"}
                                 `}
                                 >
                                 {plan.label}

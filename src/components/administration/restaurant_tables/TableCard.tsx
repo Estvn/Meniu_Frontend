@@ -17,7 +17,7 @@ export const TableCard = ({
   onViewQR,
 }: TableCardProps) => {
   return (
-    <article className="flex flex-col gap-3 items-start p-3 bg-white rounded-lg border border-solid shadow-sm w-full sm:p-4 sm:gap-2.5">
+    <article className="flex flex-col gap-3 items-start p-3 bg-white rounded-lg shadow-sm w-full sm:p-4 sm:gap-2.5">
       <div className="flex items-start justify-between self-stretch w-full">
         <div className="flex items-center flex-1 min-w-0">
           <div className="flex justify-center items-center w-10 h-10 bg-red-50 rounded-full shrink-0 sm:w-12 sm:h-12">
