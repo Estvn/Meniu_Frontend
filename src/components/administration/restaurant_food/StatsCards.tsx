@@ -1,7 +1,11 @@
 "use client";
 import { StatCard } from "./StatCard";
 
-export function StatsCards() {
+interface StatsCardsProps {
+  onAddItemClick?: () => void;
+}
+
+export function StatsCards({ onAddItemClick }: StatsCardsProps) {
   const stats = [
     { value: "4", label: "Elementos en Menú" },
     { value: "3", label: "Disponibles" },
@@ -24,7 +28,10 @@ export function StatsCards() {
         </div>
       </div>
       <div className="max-w-4xl mx-auto mt-4">
-        <button className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 transition-all duration-200 ease-in-out rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] p-3 sm:p-4 min-h-[48px] sm:min-h-[56px] flex items-center justify-center">
+        <button
+          className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 transition-all duration-200 ease-in-out rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] p-3 sm:p-4 min-h-[48px] sm:min-h-[56px] flex items-center justify-center"
+          onClick={onAddItemClick}
+        >
           <span className="text-sm sm:text-base font-medium text-white text-center">
             Agregar Nuevo Elemento al Menú
           </span>

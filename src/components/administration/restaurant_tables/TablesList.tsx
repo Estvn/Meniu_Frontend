@@ -3,20 +3,20 @@ import { TableCard } from "./TableCard";
 
 interface Table {
   id: string;
-  capacity: number;
+  qr_code?: string;
+  numero_mesa?: number;
+  estado_mesa?: string;
 }
 
 interface TablesListProps {
   tables: Table[];
-  onEditTable?: (tableId: string) => void;
-  onDeleteTable?: (tableId: string) => void;
+  onDeactivateTable?: (tableId: string) => void;
   onViewQR?: (tableId: string) => void;
 }
 
 export const TablesList = ({
   tables,
-  onEditTable,
-  onDeleteTable,
+  onDeactivateTable,
   onViewQR,
 }: TablesListProps) => {
   return (
@@ -33,9 +33,9 @@ export const TablesList = ({
             <TableCard
               key={table.id}
               tableId={table.id}
-              capacity={table.capacity}
-              onEdit={() => onEditTable?.(table.id)}
-              onDelete={() => onDeleteTable?.(table.id)}
+              numeroMesa={table.numero_mesa}
+              estadoMesa={table.estado_mesa}
+              onDeactivate={() => onDeactivateTable?.(table.id)}
               onViewQR={() => onViewQR?.(table.id)}
             />
           ))}

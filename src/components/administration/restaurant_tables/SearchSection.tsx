@@ -33,19 +33,28 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
           />
         </div>
         
-        {/* Capacity Filter */}
+        {/* Estado Filter */}
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          <button className="px-4 py-2 bg-red-50 hover:bg-red-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-900 transition-colors duration-200">
-            Todas las capacidades
+          <button
+            className="px-4 py-2 bg-red-50 hover:bg-red-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-900 transition-colors duration-200"
+            onClick={() => onSearch('todas')}
+            type="button"
+          >
+            Todas
           </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
-            2 personas
+          <button
+            className="px-4 py-2 bg-white hover:bg-green-50 border border-gray-300 rounded-lg text-sm font-medium text-green-700 transition-colors duration-200"
+            onClick={() => onSearch('activa')}
+            type="button"
+          >
+            Activas
           </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
-            4 personas
-          </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
-            6+ personas
+          <button
+            className="px-4 py-2 bg-white hover:bg-red-50 border border-gray-300 rounded-lg text-sm font-medium text-red-700 transition-colors duration-200"
+            onClick={() => onSearch('inactiva')}
+            type="button"
+          >
+            Inactivas
           </button>
         </div>
       </div>

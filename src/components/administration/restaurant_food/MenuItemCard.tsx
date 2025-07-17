@@ -8,6 +8,8 @@ interface MenuItemCardProps {
   status: string;
   category: string;
   image: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export function MenuItemCard({
@@ -17,6 +19,8 @@ export function MenuItemCard({
   status,
   category,
   image,
+  onEdit,
+  onDelete,
 }: MenuItemCardProps) {
   return (
     <article className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-4 sm:p-6">
@@ -69,10 +73,16 @@ export function MenuItemCard({
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-        <button className="flex-1 px-4 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200 text-sm">
+        <button 
+          onClick={onEdit}
+          className="flex-1 px-4 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200 text-sm"
+        >
           Editar
         </button>
-        <button className="flex-1 px-4 py-2 sm:py-3 bg-red-50 hover:bg-red-100 text-red-600 font-medium rounded-lg transition-colors duration-200 text-sm">
+        <button 
+          onClick={onDelete}
+          className="flex-1 px-4 py-2 sm:py-3 bg-red-50 hover:bg-red-100 text-red-600 font-medium rounded-lg transition-colors duration-200 text-sm"
+        >
           Eliminar
         </button>
       </div>

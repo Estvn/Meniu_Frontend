@@ -2,7 +2,22 @@
 
 import { MenuItemCard } from "./MenuItemCard";
 
-export function MenuItemsList() {
+interface FoodData {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  status: string;
+  category: string;
+  image: string;
+}
+
+interface MenuItemsListProps {
+  onEditFood?: (food: FoodData) => void;
+  onDeleteFood?: (food: FoodData) => void;
+}
+
+export function MenuItemsList({ onEditFood, onDeleteFood }: MenuItemsListProps) {
   const menuItems = [
     {
       id: 1,
@@ -36,7 +51,12 @@ export function MenuItemsList() {
         </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {menuItems.map((item) => (
-            <MenuItemCard key={item.id} {...item} />
+            <MenuItemCard 
+              key={item.id} 
+              {...item} 
+              onEdit={() => onEditFood?.(item)} 
+              onDelete={() => onDeleteFood?.(item)}
+            />
           ))}
         </div>
       </div>

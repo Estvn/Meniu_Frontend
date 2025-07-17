@@ -1,10 +1,14 @@
 "use client";
 
+type RoleFilter = "todos" | "cajeros" | "cocineros";
+
 interface SearchSectionProps {
   onSearch: (query: string) => void;
+  onRoleFilter: (role: RoleFilter) => void;
+  activeRoleFilter: RoleFilter;
 }
 
-export function SearchSection({ onSearch }: SearchSectionProps) {
+export function SearchSection({ onSearch, onRoleFilter, activeRoleFilter }: SearchSectionProps) {
   return (
     <section className="w-full px-4 mb-5 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white border-b border-gray-200">
       <div className="max-w-4xl mx-auto space-y-4">
@@ -35,13 +39,34 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
         
         {/* Role Filter */}
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          <button className="px-4 py-2 bg-red-50 hover:bg-red-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-900 transition-colors duration-200">
+          <button 
+            onClick={() => onRoleFilter("todos")}
+            className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
+              activeRoleFilter === "todos" 
+                ? "bg-red-50 border-red-300 text-gray-900" 
+                : "bg-white hover:bg-gray-50 border-gray-300 text-gray-700"
+            }`}
+          >
             Todos los roles
           </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
+          <button 
+            onClick={() => onRoleFilter("cajeros")}
+            className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
+              activeRoleFilter === "cajeros" 
+                ? "bg-red-50 border-red-300 text-gray-900" 
+                : "bg-white hover:bg-gray-50 border-gray-300 text-gray-700"
+            }`}
+          >
             Cajeros
           </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
+          <button 
+            onClick={() => onRoleFilter("cocineros")}
+            className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
+              activeRoleFilter === "cocineros" 
+                ? "bg-red-50 border-red-300 text-gray-900" 
+                : "bg-white hover:bg-gray-50 border-gray-300 text-gray-700"
+            }`}
+          >
             Cocineros
           </button>
         </div>

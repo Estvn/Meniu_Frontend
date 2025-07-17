@@ -10,6 +10,7 @@ import { PersonalIconWhite } from "../icons/PersonalIconWhite";
 import { NavigationItem } from "./NavigationItem";
 import { LogoutButton } from "./LogoutButton";
 import { LogoutIcon } from "../icons/LogoutIcon";
+import { clearStoredAuth, getStoredUserData } from "../../../assets/scripts/values/constValues";
 
 interface HeaderNavBarProps {
   title: string;
@@ -25,6 +26,10 @@ export function HeaderNavBar({title, subtitle}: HeaderNavBarProps) {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  
+  // Obtener datos del usuario
+  const userData = getStoredUserData();
+  const userName = userData?.nombre || 'Usuario';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -67,8 +72,10 @@ export function HeaderNavBar({title, subtitle}: HeaderNavBarProps) {
   }, [sidebarOpen]);
 
   const handleLogout = () => {
-    // Aquí va la lógica de cierre de sesión
-    alert("Sesión cerrada");
+    // Limpiar datos de autenticación del sessionStorage
+    clearStoredAuth();
+    // Redirigir al login
+    window.location.href = '/';
   };
 
   return (
@@ -126,6 +133,9 @@ export function HeaderNavBar({title, subtitle}: HeaderNavBarProps) {
           </button>
           {userMenuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+              <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+                {userName}
+              </div>
               <LogoutButton onClick={handleLogout} />
             </div>
           )}

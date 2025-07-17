@@ -5,6 +5,11 @@ import type { SubmitHandler } from "react-hook-form";
 import { useStepContext } from "./StepContext"; 
 import ButtonNext from "./ButtonNext";
 import { useFormPersistence } from "../../../hooks/useFormPersistence";
+import { usePlanes } from '../../../endpoints/administration/planes';
+import { useRegistroCliente } from '../../../endpoints/administration/registro';
+import { Modal } from '../forms/Modal';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface FormValues {
     firstName: string;
@@ -67,9 +72,50 @@ export default function FormRegistry() {
         key: 'registry-form-data'
     });
 
+    const { data: planes, isLoading, error } = usePlanes();
+    const { mutate } = useRegistroCliente();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
+
     const onSubmit: SubmitHandler<FormValues> = (data) => {
-        console.log("Final Data:", data);
-        // Limpiar datos guardados y resetear el paso después del envío exitoso
+        // Mapear los datos del formulario a los campos del endpoint
+        const payload = {
+            cvv: data.cvv,
+            mes_expiracion: data.expMonth,
+            nombre_propietario_tarjeta: data.ownerName,
+            email_restaurante: data.restaurantEmail,
+            nombre: data.firstName,
+            numero_tarjeta: data.cardNumber,
+            anio_expiracion: data.expYear,
+            descripcion: 'Restaurante de comida tradicional', // Valor fijo o puedes mapearlo de un campo
+            id_plan: data.subscriptionPlan,
+            direccion: data.address,
+            nombre_restaurante: data.restaurantName,
+            telefono: data.phone,
+            apellidos: data.lastName,
+            password: data.password,
+            email: data.email,
+        };
+        mutate(payload, {
+            onSuccess: (response) => {
+                if (response.success) {
+                    setShowSuccessModal(true);
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                        navigate('/menu');
+                    }, 2000);
+                } else {
+                    setErrorMessage(response.message || 'Hubo un problema con el registro.');
+                    setShowErrorModal(true);
+                }
+            },
+            onError: (error) => {
+                setErrorMessage(error.message || 'Hubo un problema con el registro.');
+                setShowErrorModal(true);
+            }
+        });
         clearPersistedData();
         resetStep();
     };
@@ -170,22 +216,24 @@ export default function FormRegistry() {
                         Seleccione su Plan de Suscripción
                         </h2>
                         <div className="flex flex-col space-y-3">
-                        {[
-                            { value: "basic", label: "Plan Básico - L. 250" },
-                            { value: "average", label: "Plan Promedio - L. 450" },
-                            { value: "premium", label: "Plan Meniu - L. 700" },
-                        ].map((plan) => (
+                        {isLoading && <span>Cargando planes...</span>}
+                        {error && <span className="text-red-500">Error al cargar los planes</span>}
+                        {planes && planes.map((plan) => (
                             <button
-                                key={plan.value}
+                                key={plan.id_plan}
                                 type="button"
-                                onClick={() => methods.setValue("subscriptionPlan", plan.value)}
+                                onClick={() => methods.setValue("subscriptionPlan", String(plan.id_plan))}
                                 className={`w-full py-3 px-4 text-center rounded-md text-white text-sm sm:text-base font-medium transition-all duration-200
-                                    ${getValues("subscriptionPlan") === plan.value
+                                    ${getValues("subscriptionPlan") === String(plan.id_plan)
                                     ? "bg-orange-500 text-white"
                                     : "bg-orange-300 bg-opacity-70 hover:bg-opacity-80"}
                                 `}
                                 >
-                                {plan.label}
+                                <div className="flex flex-col items-start">
+                                    <span className="font-semibold">{plan.nombre_plan}</span>
+                                    <span className="text-xs">Mesas: {plan.numero_mesas} | Productos: {plan.numero_productos} | Cocineros: {plan.numero_cocineros}</span>
+                                    <span className="font-bold">L. {plan.precio}</span>
+                                </div>
                             </button>
                         ))}
                         </div>
@@ -208,7 +256,11 @@ export default function FormRegistry() {
                         <InputField
                         id="cardNumber"
                         label="Número de Tarjeta"
-                        validation={{ required: "Requerido" }}
+                        validation={{
+                            required: "Requerido",
+                            minLength: { value: 13, message: "Debe tener al menos 13 dígitos" },
+                            pattern: { value: /^\d+$/, message: "Solo números" },
+                        }}
                         />
                         <InputField
                         id="cvv"
@@ -227,7 +279,11 @@ export default function FormRegistry() {
                             <InputField
                             id="expYear"
                             label="Año Exp"
-                            validation={{ required: "Requerido" }}
+                            validation={{
+                                required: "Requerido",
+                                min: { value: 2023, message: "Debe ser 2023 o mayor" },
+                                pattern: { value: /^\d{4}$/, message: "Debe ser un año válido" },
+                            }}
                             />
                         </div>
                         </div>
@@ -286,6 +342,23 @@ export default function FormRegistry() {
                         />
                     </div>
                 </div>
+                {showSuccessModal && (
+                    <Modal>
+                        <div className="flex flex-col items-center justify-center p-4">
+                            <h2 className="text-xl font-bold mb-2 text-center">¡Su Registro ha Sido Exitoso!</h2>
+                            <p className="text-center">Será redirigido al menú principal...</p>
+                        </div>
+                    </Modal>
+                )}
+                {showErrorModal && (
+                    <Modal>
+                        <div className="flex flex-col items-center justify-center p-4">
+                            <h2 className="text-xl font-bold mb-2 text-center text-red-600">Hubo un problema</h2>
+                            <p className="text-center">{errorMessage}</p>
+                            <button className="mt-4 px-4 py-2 bg-orange-500 text-white rounded" onClick={() => setShowErrorModal(false)}>Cerrar</button>
+                        </div>
+                    </Modal>
+                )}
             </form>
         </FormProvider>
     );

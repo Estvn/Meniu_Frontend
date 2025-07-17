@@ -1,19 +1,12 @@
 "use client";
 import React from "react";
 import { UserCard } from "./UserCard";
-
-interface User {
-  id: string;
-  name: string;
-  initials: string;
-  role: "cashier" | "cook";
-  status: "active" | "inactive";
-}
+import type { User } from "../../../types/User";
 
 interface UserListProps {
   users: User[];
-  onEditUser: (userId: string) => void;
-  onDeleteUser: (userId: string) => void;
+  onEditUser: (userId: number) => void;
+  onDeleteUser: (userId: number) => void;
 }
 
 export const UserList: React.FC<UserListProps> = ({
@@ -29,10 +22,10 @@ export const UserList: React.FC<UserListProps> = ({
             Usuarios del Personal
           </h2>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 mb-8">
           {users.map((user) => (
             <UserCard
-              key={user.id}
+              key={user.id_usuario}
               user={user}
               onEdit={onEditUser}
               onDelete={onDeleteUser}
@@ -40,7 +33,7 @@ export const UserList: React.FC<UserListProps> = ({
           ))}
         </div>
         {users.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 mb-8">
             No se encontraron usuarios
           </div>
         )}
