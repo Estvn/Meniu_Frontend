@@ -10,7 +10,6 @@ interface HeaderProps {
 }
 
 // totalItems: Cantidad total de productos en el carrito
-// onClearCart: Función para vaciar el carrito
 // onNavigate: Función para navegar a la página del carrito
 
 export function Header({ totalItems }: HeaderProps) {

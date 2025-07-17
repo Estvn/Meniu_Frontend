@@ -10,6 +10,7 @@ import MesasGerente from './components/administration/restaurant_tables/MesasGer
 import PersonalGerente from './components/administration/restaurant_staff/PersonalGerente.tsx';
 import ClienteMenu from './pages/cliente/ClienteMenu.tsx';
 import CartPageWrapper from './components/cliente/cart/CartPageWrapper.tsx';
+import MisPedidosPageWrapper from './components/cliente/orders/MisPedidosPageWrapper.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path = "/personal" element = {<PersonalGerente/>}></Route>
         <Route path = "/cliente" element = {<ClienteMenu/>}></Route>
         <Route path = "/carrito" element = {<CartPageWrapper/>}></Route>
+        <Route path = "/mis-pedidos" element = {<MisPedidosPageWrapper/>}></Route>
       </Routes>
 
       

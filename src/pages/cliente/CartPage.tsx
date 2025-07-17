@@ -10,6 +10,7 @@ import { CartItemsList } from "../../components/cliente/cart/CartItemList.tsx";
 import { ClearCartButton } from "../../components/cliente/cart/ClearCartButton.tsx";
 import { CartSummary } from "../../components/cliente/cart/CartSummary.tsx";
 import { CartActions } from "../../components/cliente/cart/CartActions.tsx";
+import { useOrders } from "../../components/cliente/hooks/useOrders.ts";
 import { toast } from "sonner";
 
 // cart contiene los productos del carrito
@@ -20,48 +21,46 @@ import { toast } from "sonner";
 
 interface CartPageProps {
   cart: CartItem[];
+  subtotal: number;
+  isv: number;
   totalPrice: number;
   onUpdateQuantity: (itemId: string, newQuantity: number) => void;
   onRemoveItem: (itemId: string) => void;
   onClearCart: () => void;
 }
 
+
+
 export default function CartPage({
   cart,
+  subtotal,
+  isv,
+  totalPrice,
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
 }: CartPageProps) {
   const navigate = useNavigate();
+  const { addOrder } = useOrders();
 
-  // showConfirmation es un estado para manejar la visibilidad del modal de confirmación de pedido
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-  const isv = subtotal * 0.15;
-  const calculatedTotal = subtotal + isv;
-
-  //Muestra el modal de confirmación de pedido
   const handlePlaceOrder = () => {
     setShowConfirmation(true);
   };
 
-
-  //Envia el pedido a la cocina y muestra un mensaje de éxito
   const handleConfirmOrder = () => {
+    addOrder(cart, subtotal, isv, totalPrice);
 
-    toast("Pedido enviado a la cocina!", {
-        description: `Mesa 1 - ${cart.length} productos`,
-        duration: 3000,
-        style: {
-          backgroundColor: "#fb3260",
-          color: "white",
-          fontWeight: "500",
-        },
-      });
+    toast.success("¡Pedido enviado a la cocina!", {
+      description: `Mesa 1 - ${cart.length} productos`,
+      duration: 3000,
+      style: {
+        backgroundColor: "#10b981",
+        color: "white",
+        fontWeight: "500",
+      },
+    });
 
     onClearCart();
     setShowConfirmation(false);
@@ -99,7 +98,7 @@ export default function CartPage({
             itemCount={cart.length}
             subtotal={subtotal}
             isv={isv}
-            total={calculatedTotal}
+            total={totalPrice}
           />
 
           <CartActions onPlaceOrder={handlePlaceOrder} />
@@ -109,7 +108,7 @@ export default function CartPage({
       <OrderConfirmationModal
         isOpen={showConfirmation}
         cart={cart}
-        totalPrice={calculatedTotal}
+        totalPrice={totalPrice}
         onConfirm={handleConfirmOrder}
         onCancel={() => setShowConfirmation(false)}
       />
