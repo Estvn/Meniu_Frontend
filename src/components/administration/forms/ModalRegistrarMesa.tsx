@@ -3,8 +3,20 @@ import * as React from "react";
 import { Modal } from "./Modal";
 import { FormField } from "./FormField";
 import { Button } from "./Button";
-import QRCode from 'qrcode';
 import { useEffect, useRef, useState } from 'react';
+
+// Declaración de tipos para Google API
+declare global {
+  interface Window {
+    google: {
+      accounts: {
+        oauth2: {
+          initTokenClient: (config: any) => any;
+        };
+      };
+    };
+  }
+}
 
 interface ModalRegistrarMesaProps {
   onClose?: () => void;

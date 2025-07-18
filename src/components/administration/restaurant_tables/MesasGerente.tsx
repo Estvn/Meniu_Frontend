@@ -118,7 +118,7 @@ export const MesasGerente = () => {
     }
   };
 
-  const handleViewQR = (id: number, qr_code: string, numero_mesa: number) => {
+  const handleViewQR = (id: number, _qr_code: string, numero_mesa: number) => {
     // Generar el contenido original del QR (JSON con número de mesa y restaurante_id)
     const restauranteId = getRestauranteIdFromToken();
     console.log('🔍 handleViewQR - restauranteId:', restauranteId);
