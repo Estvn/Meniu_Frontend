@@ -1,12 +1,21 @@
 // Maneja la navegacion entre categorias y subcayegorias del menu
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { MenuItem, MenuCategories } from "../shared/restaurant-types.ts";
 
 export function useMenuNavigation(menuCategories: MenuCategories) {
-  const [activeCategory, setActiveCategory] = useState("Comidas");
+   const categoryNames = Object.keys(menuCategories);
+  const [activeCategory, setActiveCategory] = useState<string>(
+    categoryNames[0] || ""
+  );
   const [activeSubCategory, setActiveSubCategory] = useState("Ver todo");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Actualizar activeCategory si cambia el menuCategories dinámicamente
+  useEffect(() => {
+    if (categoryNames.length > 0 && !activeCategory) {
+      setActiveCategory(categoryNames[0]);
+    }
+  }, [menuCategories, activeCategory, categoryNames]);
 
   const scrollToCategories = () => {
     // Calculate the height of fixed elements precisely to position at category title

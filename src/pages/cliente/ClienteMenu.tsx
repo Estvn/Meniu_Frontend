@@ -1,9 +1,12 @@
-import { useState } from "react";
-import type { MenuItem, ViewType } from "../../components/cliente/shared/restaurant-types";
+import { useEffect ,useState } from "react";
+import type { MenuItem, ViewType, MenuCategories } from "../../components/cliente/shared/restaurant-types";
 import { useCart } from "../../components/cliente/hooks/useCart";
 import { useMenuNavigation } from "../../components/cliente/hooks/useMenuNavigation";
 import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop";
-import { menuCategories } from "../../components/cliente/menuData";
+//import { menuCategories } from "../../components/cliente/menuData";
+//import { fetchMenuCategories } from "../../components/cliente/fetch/categories.ts";
+import { fetchMenuItems } from "../../components/cliente/fetch/products.ts";
+
 import { Header } from "../../components/cliente/restaurant/MenuHeader";
 import { RestaurantInfo } from "../../components/cliente/restaurant/RestaurantInfoCard";
 import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation";
@@ -13,6 +16,9 @@ import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop";
 import ProductDetailPage from "./ProductDetails";
 
 export default function ClienteMenu() {
+  const [menuCategories, setMenuCategories] = useState<MenuCategories>({});
+  const [loading, setLoading] = useState(true);
+
   // SelectItem almacena el producto actualmente seleccionado
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   // CurrentView controla la vista actual (menú o detalle del producto)
@@ -20,6 +26,20 @@ export default function ClienteMenu() {
 
   const { addToCart, totalItems } = useCart();
   const { showScrollTop, scrollToTop } = useScrollToTop();
+
+  useEffect(() => {
+  fetchMenuItems(1)
+    .then((data) => {
+      setMenuCategories(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Error al cargar productos:", err);
+      setLoading(false);
+    });
+}, []);
+
+
   const {
     activeCategory,
     activeSubCategory,
@@ -27,6 +47,10 @@ export default function ClienteMenu() {
     handleSubCategoryClick,
     getCurrentItems,
   } = useMenuNavigation(menuCategories);
+
+   if (loading) {
+    return <div className="p-4 text-center text-gray-500">Cargando menú...</div>;
+  }
 
   // Se activa cuando el usuario hace clic en un elemento del menú y cambia la vista a producDetail
   const handleItemClick = (item: MenuItem) => {

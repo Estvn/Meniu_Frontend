@@ -31,4 +31,16 @@ export interface MenuItem {
   export type MenuCategories = Record<string, SubCategory[]>;
   
   export type ViewType = "menu" | "productDetail";
+
+  export interface CategoriaBackend {
+  id_categoria: number;
+  nombre: string;
+  activa: number;
+  subcategorias: {
+    id_subcategoria: number;
+    nombre: string;
+    activa: number;
+  }[];
+}
+
   
