@@ -10,21 +10,8 @@ interface ModalQRMesaProps {
 }
 
 export function ModalQRMesa({ mesaId, qrValue, onClose }: ModalQRMesaProps) {
-  // Determinar el contenido del QR
-  let qrContent = '';
-  if (qrValue) {
-    if (qrValue.startsWith('/uploads')) {
-      qrContent = qrValue;
-    } else if (qrValue.startsWith('{') && qrValue.endsWith('}')) {
-      // Si es un JSON string, usarlo directamente
-      qrContent = qrValue;
-    } else if (qrValue.startsWith('http')) {
-      qrContent = qrValue;
-    } else {
-      // Si no es ninguno de los anteriores, usar el valor tal como está
-      qrContent = qrValue;
-    }
-  }
+  // El contenido del QR ahora es directamente la URL
+  const qrContent = qrValue || '';
   
   console.log('🔍 ModalQRMesa - qrValue recibido:', qrValue);
   console.log('🔍 ModalQRMesa - qrContent para generar:', qrContent);

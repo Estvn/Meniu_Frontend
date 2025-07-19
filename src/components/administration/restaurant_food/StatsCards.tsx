@@ -1,16 +1,45 @@
 "use client";
 import { StatCard } from "./StatCard";
+import type { Producto } from "../../../endpoints";
 
 interface StatsCardsProps {
   onAddItemClick?: () => void;
+  onFilterChange?: (filter: 'all' | 'available' | 'unavailable') => void;
+  activeFilter?: 'all' | 'available' | 'unavailable';
+  productos?: Producto[];
 }
 
-export function StatsCards({ onAddItemClick }: StatsCardsProps) {
+export function StatsCards({ onAddItemClick, onFilterChange, activeFilter = 'all', productos = [] }: StatsCardsProps) {
+  // Calcular estadísticas dinámicamente basadas en los productos
+  const totalProductos = productos.length;
+  const productosDisponibles = productos.filter(p => p.activo === 1).length;
+  const productosNoDisponibles = productos.filter(p => p.activo === 0).length;
+
+  console.log("🔍 StatsCards - Productos recibidos:", productos);
+  console.log("🔍 StatsCards - Total:", totalProductos);
+  console.log("🔍 StatsCards - Disponibles:", productosDisponibles);
+  console.log("🔍 StatsCards - No disponibles:", productosNoDisponibles);
+
   const stats = [
-    { value: "4", label: "Elementos en Menú" },
-    { value: "3", label: "Disponibles" },
-    { value: "1", label: "No Disponibles" },
-    { value: "", label: "" },
+    { 
+      value: totalProductos.toString(), 
+      label: "Elementos en Menú", 
+      filter: 'all' as const,
+      isActive: activeFilter === 'all'
+    },
+    { 
+      value: productosDisponibles.toString(), 
+      label: "Disponibles", 
+      filter: 'available' as const,
+      isActive: activeFilter === 'available'
+    },
+    { 
+      value: productosNoDisponibles.toString(), 
+      label: "No Disponibles", 
+      filter: 'unavailable' as const,
+      isActive: activeFilter === 'unavailable'
+    },
+    { value: "", label: "", filter: null, isActive: false },
   ];
 
   return (
@@ -22,7 +51,9 @@ export function StatsCards({ onAddItemClick }: StatsCardsProps) {
               key={index} 
               value={stat.value} 
               label={stat.label} 
-              isEmpty={stat.value === ""} 
+              isEmpty={stat.value === ""}
+              isActive={stat.isActive}
+              onClick={() => stat.filter && onFilterChange?.(stat.filter)}
             />
           ))}
         </div>

@@ -19,30 +19,42 @@ interface Mesa {
 export const MesasGerente = () => {
   const [mesas, setMesas] = useState<Mesa[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showRegistrarMesa, setShowRegistrarMesa] = useState(false);
   const [qrMesa, setQrMesa] = useState<{ id: number; qr_code: string; numero_mesa?: number } | null>(null);
   const [mesaAEliminar, setMesaAEliminar] = useState<number | null>(null);
   const [actionType, setActionType] = useState<'activate' | 'deactivate'>('deactivate');
   const [filter, setFilter] = useState<'todas' | 'activa' | 'inactiva'>('todas');
 
-  useEffect(() => {
-    const fetchMesas = async () => {
+  const fetchMesas = async (showLoading = true) => {
+    if (showLoading) {
       setLoading(true);
-      try {
-        const token = sessionStorage.getItem('access_token');
-        const res = await fetch('http://localhost:3000/mesas/restaurante-mesas', {
-          headers: {
-            'accept': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        console.log('Respuesta de mesas:', data);
-        setMesas(Array.isArray(data) ? data : []);
-      } finally {
+    } else {
+      setRefreshing(true);
+    }
+    try {
+      const token = sessionStorage.getItem('access_token');
+      const res = await fetch('http://localhost:3000/mesas/restaurante-mesas', {
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      console.log('Respuesta de mesas:', data);
+      setMesas(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error al cargar mesas:', error);
+    } finally {
+      if (showLoading) {
         setLoading(false);
+      } else {
+        setRefreshing(false);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchMesas();
   }, []);
 
@@ -65,8 +77,8 @@ export const MesasGerente = () => {
   const handleCloseRegistrarMesa = () => setShowRegistrarMesa(false);
   const handleSubmitRegistrarMesa = () => {
     setShowRegistrarMesa(false);
-    // Refrescar mesas después de registrar
-    window.location.reload(); // O volver a llamar fetchMesas si quieres evitar reload
+    // Refrescar mesas después de registrar sin mostrar loading
+    fetchMesas(false);
   };
 
   const handleDeleteMesa = (id: number) => {
@@ -103,8 +115,8 @@ export const MesasGerente = () => {
       
       if (response.ok) {
         console.log(`✅ Mesa ${actionText} correctamente`);
-        // Refrescar la lista de mesas
-        window.location.reload();
+        // Refrescar la lista de mesas sin mostrar loading
+        fetchMesas(false);
       } else {
         const errorData = await response.json();
         console.error(`❌ Error ${actionText} mesa:`, errorData);
@@ -119,20 +131,19 @@ export const MesasGerente = () => {
   };
 
   const handleViewQR = (id: number, _qr_code: string, numero_mesa: number) => {
-    // Generar el contenido original del QR (JSON con número de mesa y restaurante_id)
+    // Generar la URL del QR con la estructura específica
     const restauranteId = getRestauranteIdFromToken();
     console.log('🔍 handleViewQR - restauranteId:', restauranteId);
     console.log('🔍 handleViewQR - numero_mesa:', numero_mesa);
     
     if (restauranteId) {
-      const qrContent = JSON.stringify({ numero_mesa: numero_mesa.toString(), restaurante_id: restauranteId });
-      console.log('🔍 handleViewQR - qrContent con restaurante_id:', qrContent);
+      const qrContent = `192.168.0.17:5173/cliente?id_restaurante=${restauranteId}&id_mesa=${numero_mesa}`;
+      console.log('🔍 handleViewQR - qrContent URL:', qrContent);
       setQrMesa({ id, qr_code: qrContent, numero_mesa });
     } else {
-      // Si no se puede obtener el restaurante_id, usar solo el número de mesa
-      const qrContent = JSON.stringify({ numero_mesa: numero_mesa.toString() });
-      console.log('🔍 handleViewQR - qrContent solo numero_mesa:', qrContent);
-      setQrMesa({ id, qr_code: qrContent, numero_mesa });
+      // Si no se puede obtener el restaurante_id, mostrar error
+      console.error('❌ No se pudo obtener el ID del restaurante del token');
+      alert('Error: No se pudo obtener la información del restaurante. Inténtalo de nuevo.');
     }
   };
 
@@ -162,22 +173,29 @@ export const MesasGerente = () => {
           totalTables={filteredMesas.length}
           onRegisterNewTable={handleOpenRegistrarMesa}
         />
-        {loading ? (
+        {loading && mesas.length === 0 ? (
           <div className="text-center py-8">Cargando mesas...</div>
         ) : (
-          <TablesList
-            tables={Array.isArray(filteredMesas) ? filteredMesas.map((m) => ({
-              id: m.id_mesa.toString(),
-              qr_code: m.qr_code,
-              numero_mesa: m.numero_mesa,
-              estado_mesa: m.estado_mesa,
-            })) : []}
-            onDeactivateTable={(id) => handleDeleteMesa(Number(id))}
-            onViewQR={(id) => {
-              const mesa = mesas.find((m) => m.id_mesa.toString() === id);
-              if (mesa) handleViewQR(mesa.id_mesa, mesa.qr_code, mesa.numero_mesa);
-            }}
-          />
+          <div className="relative">
+            {refreshing && (
+              <div className="absolute top-2 right-2 z-10">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
+              </div>
+            )}
+            <TablesList
+              tables={Array.isArray(filteredMesas) ? filteredMesas.map((m) => ({
+                id: m.id_mesa.toString(),
+                qr_code: m.qr_code,
+                numero_mesa: m.numero_mesa,
+                estado_mesa: m.estado_mesa,
+              })) : []}
+              onDeactivateTable={(id) => handleDeleteMesa(Number(id))}
+              onViewQR={(id) => {
+                const mesa = mesas.find((m) => m.id_mesa.toString() === id);
+                if (mesa) handleViewQR(mesa.id_mesa, mesa.qr_code, mesa.numero_mesa);
+              }}
+            />
+          </div>
         )}
         {showRegistrarMesa && (
           <ModalRegistrarMesa

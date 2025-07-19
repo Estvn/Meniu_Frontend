@@ -16,18 +16,30 @@ interface DeleteFormData {
   confirmation: string;
 }
 
-function RHFDeleteField(props: Omit<React.ComponentProps<typeof FormField>, "value" | "onChange"> & { name: keyof DeleteFormData; validation?: Record<string, unknown> }) {
-  const { register, formState: { errors, touchedFields }, watch } = useFormContext<DeleteFormData>();
+function RHFDeleteField(props: Omit<React.ComponentProps<typeof FormField>, "value" | "onChange"> & { name: keyof DeleteFormData }) {
+  const { setValue, formState: { errors, touchedFields }, watch } = useFormContext<DeleteFormData>();
   const value = watch(props.name);
   const errorMsg = errors[props.name]?.message as string | undefined;
-  const field = register(props.name, props.validation);
+  
   return (
     <div className="w-full">
-      <FormField
-        {...props}
-        value={typeof value === "string" ? value : ""}
-        onChange={(v) => field.onChange({ target: { value: v } })}
-      />
+      <div className="flex relative flex-col gap-1.5 items-start self-stretch">
+        <label className="flex relative flex-col items-start self-stretch">
+          <span className="relative self-stretch text-xs leading-5 text-gray-700 max-sm:text-xs">
+            {props.label}
+          </span>
+        </label>
+        <div className="flex relative flex-col items-start self-stretch px-2.5 pt-2.5 pb-2.5 bg-white rounded-md border-gray-300 border-solid border-[0.839px]">
+          <input
+            type="text"
+            placeholder={props.placeholder}
+            value={typeof value === "string" ? value : ""}
+            onChange={(e) => setValue(props.name, e.target.value, { shouldValidate: true })}
+            required={props.required}
+            className="relative self-stretch text-xs text-neutral-500 max-sm:text-xs bg-transparent border-none outline-none w-full"
+          />
+        </div>
+      </div>
       {errorMsg && touchedFields[props.name] && (
         <span className="mt-1 text-xs text-red-500">{errorMsg}</span>
       )}
@@ -47,6 +59,15 @@ export function ModalEliminarConfirmacion({
       confirmation: "",
     },
   });
+
+  // Registrar el campo para validación
+  React.useEffect(() => {
+    methods.register("confirmation", {
+      required: "Debe escribir 'eliminar' para confirmar",
+      validate: (value: string) => 
+        value === "eliminar" ? true : "Debe escribir exactamente 'eliminar'"
+    });
+  }, [methods]);
 
   const handleSubmit = methods.handleSubmit((data) => {
     if (data.confirmation === "eliminar") {
@@ -81,11 +102,6 @@ export function ModalEliminarConfirmacion({
               label="Confirmación"
               placeholder="eliminar"
               required
-              validation={{
-                required: "Debe escribir 'eliminar' para confirmar",
-                validate: (value: string) => 
-                  value === "eliminar" ? true : "Debe escribir exactamente 'eliminar'"
-              }}
             />
           </div>
 

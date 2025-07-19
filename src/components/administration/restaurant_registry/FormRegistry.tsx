@@ -11,6 +11,56 @@ import { Modal } from '../forms/Modal';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Icono de ojo para mostrar/ocultar contraseña
+const EyeIcon = ({ isVisible, onClick }: { isVisible: boolean; onClick: () => void }) => (
+    <button
+        type="button"
+        onClick={onClick}
+        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+    >
+        {isVisible ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+        ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+            </svg>
+        )}
+    </button>
+);
+
+// Componente específico para campos de contraseña
+function PasswordField({ id, label, validation = {} }: { id: keyof FormValues; label: string; validation?: Record<string, unknown> }) {
+    const { register, formState: { errors, touchedFields } } = useFormContext<FormValues>();
+    const [showPassword, setShowPassword] = useState(false);
+    const errorMsg = errors[id]?.message || (errors[id] && "Requerido");
+    const inputClass =
+        "w-full h-10 px-3 py-2 pr-10 bg-white border border-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base";
+    const labelClass = "block mb-1 text-left text-sm font-medium text-zinc-700";
+    const errorClass = "mt-1 text-xs text-red-500";
+
+    return (
+        <div>
+            <label htmlFor={String(id)} className={labelClass}>{label}</label>
+            <div className="relative">
+                <input
+                    id={String(id)}
+                    type={showPassword ? "text" : "password"}
+                    {...register(id, validation)}
+                    className={inputClass}
+                />
+                <EyeIcon 
+                    isVisible={showPassword} 
+                    onClick={() => setShowPassword(!showPassword)} 
+                />
+            </div>
+            {errorMsg && touchedFields[id] && <span className={errorClass}>{String(errorMsg)}</span>}
+        </div>
+    );
+}
+
 interface FormValues {
     firstName: string;
     lastName: string;
@@ -74,12 +124,18 @@ export default function FormRegistry() {
 
     const { data: planes, isLoading, error } = usePlanes();
     const { mutate } = useRegistroCliente();
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
+    const [showUserModal, setShowUserModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [generatedUsername, setGeneratedUsername] = useState('');
     const navigate = useNavigate();
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
+        // Solo registrar en el paso final (contraseña)
+        if (step !== 4) {
+            return;
+        }
+
         // Mapear los datos del formulario a los campos del endpoint
         const payload = {
             cvv: data.cvv,
@@ -101,11 +157,11 @@ export default function FormRegistry() {
         mutate(payload, {
             onSuccess: (response) => {
                 if (response.success) {
-                    setShowSuccessModal(true);
-                    setTimeout(() => {
-                        setShowSuccessModal(false);
-                        navigate('/menu');
-                    }, 2000);
+                    // Generar nombre de usuario basado en el email
+                    const email = data.email;
+                    const username = email.split('@')[0];
+                    setGeneratedUsername(username);
+                    setShowUserModal(true);
                 } else {
                     setErrorMessage(response.message || 'Hubo un problema con el registro.');
                     setShowErrorModal(true);
@@ -116,8 +172,13 @@ export default function FormRegistry() {
                 setShowErrorModal(true);
             }
         });
+    };
+
+    const handleUserModalConfirm = () => {
+        setShowUserModal(false);
         clearPersistedData();
         resetStep();
+        navigate('/');
     };
 
     const handleNext = async () => {
@@ -281,7 +342,7 @@ export default function FormRegistry() {
                             label="Año Exp"
                             validation={{
                                 required: "Requerido",
-                                min: { value: 2023, message: "Debe ser 2023 o mayor" },
+                                min: { value: 2026, message: "Debe ser 2026 o mayor" },
                                 pattern: { value: /^\d{4}$/, message: "Debe ser un año válido" },
                             }}
                             />
@@ -295,19 +356,17 @@ export default function FormRegistry() {
                         <h2 className="mb-4 sm:mb-5 text-lg sm:text-xl font-semibold text-center sm:text-left">
                         ¡Este es el Último Paso!
                         </h2>
-                        <InputField
+                        <PasswordField
                         id="password"
                         label="Contraseña"
-                        type="password"
                         validation={{
                             required: "Requerido",
                             minLength: { value: 8, message: "8+ caracteres" },
                         }}
                         />
-                        <InputField
+                        <PasswordField
                         id="confirmPassword"
                         label="Confirmar Contraseña"
-                        type="password"
                         validation={{
                             required: "Requerido",
                             validate: (val: string) =>
@@ -342,11 +401,24 @@ export default function FormRegistry() {
                         />
                     </div>
                 </div>
-                {showSuccessModal && (
+                {showUserModal && (
                     <Modal>
                         <div className="flex flex-col items-center justify-center p-4">
-                            <h2 className="text-xl font-bold mb-2 text-center">¡Su Registro ha Sido Exitoso!</h2>
-                            <p className="text-center">Será redirigido al menú principal...</p>
+                            <h2 className="text-xl font-bold mb-2 text-center text-green-600">¡Registro Exitoso!</h2>
+                            <p className="text-center mb-4">Su cuenta ha sido creada correctamente.</p>
+                            <div className="bg-gray-50 p-4 rounded-lg mb-4 w-full">
+                                <p className="text-sm text-gray-600 mb-2">Su nombre de usuario es:</p>
+                                <p className="text-lg font-bold text-gray-800">{generatedUsername}</p>
+                            </div>
+                            <p className="text-center text-sm text-gray-600 mb-4">
+                                Use su correo electrónico y contraseña para iniciar sesión.
+                            </p>
+                            <button 
+                                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                                onClick={handleUserModalConfirm}
+                            >
+                                Ir al Login
+                            </button>
                         </div>
                     </Modal>
                 )}

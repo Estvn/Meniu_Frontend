@@ -12,6 +12,7 @@ interface DropdownFieldProps {
   value: string;
   onChange: (value: string) => void;
   containerClassName?: string;
+  disabled?: boolean;
 }
 
 export function DropdownField({
@@ -20,6 +21,7 @@ export function DropdownField({
   value,
   onChange,
   containerClassName = "",
+  disabled = false,
 }: DropdownFieldProps) {
   return (
     <div
@@ -34,7 +36,8 @@ export function DropdownField({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="flex relative gap-0.5 justify-center items-start self-stretch pt-2 pr-8 pb-2.5 pl-3 bg-white rounded-md border-gray-300 border-solid border-[0.839px] h-[33px] w-full text-xs text-neutral-500 max-sm:text-xs appearance-none cursor-pointer"
+          disabled={disabled}
+          className={`flex relative gap-0.5 justify-center items-start self-stretch pt-2 pr-8 pb-2.5 pl-3 bg-white rounded-md border-gray-300 border-solid border-[0.839px] h-[33px] w-full text-xs text-neutral-500 max-sm:text-xs appearance-none ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
