@@ -1,7 +1,17 @@
 "use client";
 
 
-export function SearchSection() {
+interface SearchSectionProps {
+  onCategoryFilterChange?: (categoryId: string | null) => void;
+  activeCategoryFilter?: string | null;
+  categories?: Array<{ id_categoria: number; nombre: string }>;
+}
+
+export function SearchSection({ 
+  onCategoryFilterChange, 
+  activeCategoryFilter = null,
+  categories = []
+}: SearchSectionProps) {
   return (
     <section className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white border-b border-gray-200">
       <div className="max-w-4xl mx-auto space-y-4">
@@ -31,15 +41,32 @@ export function SearchSection() {
         
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          <button className="px-4 py-2 bg-red-50 hover:bg-red-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-900 transition-colors duration-200">
+          {/* Botón "Todas las categorías" */}
+          <button 
+            className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
+              activeCategoryFilter === null
+                ? 'bg-red-50 hover:bg-red-100 border-red-300 text-gray-900'
+                : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
+            }`}
+            onClick={() => onCategoryFilterChange?.(null)}
+          >
             Todas las categorías
           </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
-            Entradas
-          </button>
-          <button className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors duration-200">
-            Platos Principales
-          </button>
+          
+          {/* Botones de categorías dinámicas */}
+          {categories.map((category) => (
+            <button 
+              key={category.id_categoria}
+              className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
+                activeCategoryFilter === category.id_categoria.toString()
+                  ? 'bg-red-50 hover:bg-red-100 border-red-300 text-gray-900'
+                  : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
+              }`}
+              onClick={() => onCategoryFilterChange?.(category.id_categoria.toString())}
+            >
+              {category.nombre}
+            </button>
+          ))}
         </div>
       </div>
     </section>

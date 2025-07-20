@@ -4,6 +4,10 @@ import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import ButtonNext from "./ButtonNext";
 import { useFormPersistence } from "../../../hooks/useFormPersistence";
+import { useLogin } from '../../../endpoints/administration/login';
+import { Modal } from '../forms/Modal';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface FormValues {
     userOrEmail: string;
@@ -50,9 +54,46 @@ export default function FormLogin() {
         key: 'login-form-data'
     });
 
+    const { mutate, isPending } = useLogin();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
+
     const onSubmit: SubmitHandler<FormValues> = (data) => {
-        console.log("Form Data:", data);
-        // Limpiar datos guardados después del envío exitoso
+        console.log('Form submitted with data:', data);
+        
+        // Mapear los datos del formulario a los campos del endpoint
+        const payload = {
+            nombre_usuario: data.userOrEmail,
+            password: data.password,
+        };
+        
+        console.log('Sending payload to API:', payload);
+        
+        mutate(payload, {
+            onSuccess: (response) => {
+                console.log('Login successful:', response);
+                if (response.access_token) {
+                    // Solo guardar el token, los datos del usuario se extraen del JWT
+                    sessionStorage.setItem('access_token', response.access_token);
+                    
+                    setShowSuccessModal(true);
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                        navigate('/menu');
+                    }, 2000);
+                } else {
+                    setErrorMessage('Respuesta inesperada del servidor');
+                    setShowErrorModal(true);
+                }
+            },
+            onError: (error) => {
+                console.error('Login error:', error);
+                setErrorMessage(error.message || 'Error al iniciar sesión');
+                setShowErrorModal(true);
+            }
+        });
         clearPersistedData();
     };
 
@@ -99,10 +140,28 @@ export default function FormLogin() {
 
                     <div className="mt-6 flex justify-center sm:justify-end w-full max-w-sm mx-auto">
                         <ButtonNext
-                            text="Iniciar Sesión"
+                            text={isPending ? "Iniciando sesión..." : "Iniciar Sesión"}
+                            disabled={isPending}
                         />
                     </div>
                 </div>
+                {showSuccessModal && (
+                    <Modal>
+                        <div className="flex flex-col items-center justify-center p-4">
+                            <h2 className="text-xl font-bold mb-2 text-center">¡Inicio Exitoso!</h2>
+                            <p className="text-center">Será redirigido al menú principal...</p>
+                        </div>
+                    </Modal>
+                )}
+                {showErrorModal && (
+                    <Modal>
+                        <div className="flex flex-col items-center justify-center p-4">
+                            <h2 className="text-xl font-bold mb-2 text-center text-red-600">Error de inicio de sesión</h2>
+                            <p className="text-center">{errorMessage}</p>
+                            <button className="mt-4 px-4 py-2 bg-orange-500 text-white rounded" onClick={() => setShowErrorModal(false)}>Cerrar</button>
+                        </div>
+                    </Modal>
+                )}
             </form>
         </FormProvider>
     );
