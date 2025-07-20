@@ -3,8 +3,8 @@ import type { CartItem as CartItemType } from "../../cliente/shared/restaurant-t
 
 interface CartItemsListProps {
   items: CartItemType[];
-  onUpdateQuantity: (itemId: string, newQuantity: number) => void;
-  onRemoveItem: (itemId: string) => void;
+  onUpdateQuantity: (uid: string, newQuantity: number) => void;
+  onRemoveItem: (uid: string) => void;
 }
 
 export function CartItemsList({

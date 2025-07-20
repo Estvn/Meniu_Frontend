@@ -1,17 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import type { Order } from "../../components/cliente/shared/order-types.ts";
+import { useEffect, useState } from "react";
+import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop.ts";
+import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop.tsx";
 import { Header } from "../../components/cliente/restaurant/MenuHeader.tsx";
 import { RestaurantInfo } from "../../components/cliente/restaurant/RestaurantInfoCard.tsx";
+import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation.tsx";
 import { OrderSummary } from "../../components/cliente/orders/OrderSummary.tsx";
 import { OrderCard } from "../../components/cliente/orders/OrderCart.tsx";
-import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation.tsx";
-import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop.tsx";
-import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop.ts";
 import { toast } from "sonner";
+import type { Order } from "../../components/cliente/shared/order-types.ts";
 
 interface MisPedidosPageProps {
   orders: Order[];
-  onCancelOrder: (orderId: string) => void;
+  onCancelOrder: (orderId: number) => void;
   totalActiveAmount: number;
   activeOrdersCount: number;
   totalCartItems: number;
@@ -25,9 +26,18 @@ export default function MisPedidosPage({
   totalCartItems,
 }: MisPedidosPageProps) {
   const navigate = useNavigate();
+  const [numeroMesa, setNumeroMesa] = useState<number | null>(null);
+
   const { showScrollTop, scrollToTop } = useScrollToTop();
 
-  const handleCancelOrder = (orderId: string) => {
+  useEffect(() => {
+    const storedMesa = localStorage.getItem("id_mesa");
+    if (storedMesa) {
+      setNumeroMesa(Number(storedMesa));
+    }
+  }, []);
+
+  const handleCancelOrder = (orderId: number) => {
     onCancelOrder(orderId);
 
     toast.error("Pedido cancelado", {
@@ -36,33 +46,33 @@ export default function MisPedidosPage({
     });
   };
 
-  
-
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <Header totalItems={totalCartItems} />
+      {numeroMesa !== null && (
+        <Header totalItems={totalCartItems} numeroMesa={numeroMesa} />
+      )}
       <RestaurantInfo />
       <MenuNavigation />
-    
 
       <div className="p-4">
-        {/* Order Summary */}
+        {/* Resumen de pedidos activos */}
         <OrderSummary
           totalAmount={totalActiveAmount}
           activeOrdersCount={activeOrdersCount}
         />
 
-        {/* Orders List */}
+        {/* Lista de pedidos */}
         <div className="space-y-4">
           {orders.map((order) => (
             <OrderCard
-              key={`${order.id}-${order.orderNumber}`}
+              key={order.id_orden}
               order={order}
-              onCancelOrder={handleCancelOrder}
+              onCancelOrder={() => handleCancelOrder(order.id_orden)}
             />
           ))}
         </div>
 
+        {/* Sin pedidos */}
         {orders.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -1,23 +1,41 @@
-export type OrderStatus = "pendiente" | "preparando" | "listo" | "cancelado";
+export type OrderStatus = "PENDIENTE" | "PREPARANDO" | "LISTO" | "CANCELADO";
 
 export interface OrderItem {
-  id: string;
-  name: string;
-  quantity: number;
-  price: number;
-  complements?: string; // Store complements as string for display
+  id_orden_item: number;
+  id_producto: number;
+  nombre_producto: string;
+  cantidad: number;
+  precio_unitario: number;
+  notas?: string;
+}
+
+export interface Mesa {
+  id_mesa: number;
+  numero_mesa: number;
+  qr_code?: string;
+  estado_mesa?: string;
+}
+
+export interface Restaurante {
+  id_restaurante: number;
+  nombre: string;
 }
 
 export interface Order {
-  id: string;
-  orderNumber: string;
-  status: OrderStatus;
-  items: OrderItem[];
+  id_orden: number;
+  estado: OrderStatus;
+  fecha: string;
+  hora_confirmacion: string;
+  hora_lista?: string | null;
+  hora_entregada?: string | null;
   subtotal: number;
-  isv: number;
+  impuestos: number;
   total: number;
-  timestamp: string;
-  createdAt: number; // Unix timestamp for precise timing
-  estimatedTime?: string;
-  description?: string;
+  solicitud_pago: boolean;
+  notas: string;
+
+  restaurante: Restaurante;
+  mesa: Mesa;
+
+  items: OrderItem[];
 }

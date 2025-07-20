@@ -15,51 +15,57 @@ export function useCart() {
     item: MenuItem,
     complements: Complement[] = [],
     instructions: string = "",
-    quantity: number = 1,
+    quantity: number = 1
   ) => {
     const complementsTotal = complements.reduce((sum, comp) => sum + comp.price, 0);
     const totalPrice = item.price + complementsTotal;
 
-    const complementIds = complements.map((comp) => comp.id).sort().join(",");
-    const uniqueId = `${item.id}-${complementIds}-${instructions}`;
+    // Crear uid: combinación única por producto + complementos + instrucciones
+    const complementIds = complements
+      .filter((comp) => comp.selected)
+      .map((comp) => comp.id)
+      .sort()
+      .join(",");
 
-    const cartItem: CartItem = {
-      ...item,
-      id: uniqueId,
-      price: totalPrice,
-      quantity,
-      complements,
-      instructions,
-    };
+    const uid = `${item.id}-${complementIds}-${instructions.trim()}`;
 
-    const existingItemIndex = cart.findIndex((cartItem) => cartItem.id === uniqueId);
+    const existingIndex = cart.findIndex((cartItem) => cartItem.uid === uid);
 
-    if (existingItemIndex !== -1) {
+    if (existingIndex !== -1) {
       const updatedCart = [...cart];
-      updatedCart[existingItemIndex] = {
-        ...updatedCart[existingItemIndex],
-        quantity: updatedCart[existingItemIndex].quantity + quantity,
+      updatedCart[existingIndex] = {
+        ...updatedCart[existingIndex],
+        quantity: updatedCart[existingIndex].quantity + quantity,
       };
       setCart(updatedCart);
     } else {
+      const cartItem: CartItem = {
+        ...item,
+        id: item.id, // número
+        uid,         // cadena única solo para carrito
+        price: totalPrice,
+        quantity,
+        complements,
+        instructions,
+      };
       setCart([...cart, cartItem]);
     }
   };
 
-  const updateCartItemQuantity = (itemId: string, newQuantity: number) => {
+  const updateCartItemQuantity = (uid: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      setCart(cart.filter((item) => item.id !== itemId));
+      setCart(cart.filter((item) => item.uid !== uid));
     } else {
       setCart(
         cart.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item,
-        ),
+          item.uid === uid ? { ...item, quantity: newQuantity } : item
+        )
       );
     }
   };
 
-  const removeFromCart = (itemId: string) => {
-    setCart(cart.filter((item) => item.id !== itemId));
+  const removeFromCart = (uid: string) => {
+    setCart(cart.filter((item) => item.uid !== uid));
   };
 
   const clearCart = () => {

@@ -3,8 +3,8 @@ import type { CartItem as CartItemType } from "../../cliente/shared/restaurant-t
 
 interface CartItemProps {
   item: CartItemType;
-  onUpdateQuantity: (itemId: string, newQuantity: number) => void;
-  onRemove: (itemId: string) => void;
+  onUpdateQuantity: (uid: string, newQuantity: number) => void;
+  onRemove: (uid: string) => void;
 }
 
 export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
@@ -54,7 +54,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
           {/* Botones de cantidad y eliminar */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+              onClick={() => onUpdateQuantity(item.uid, item.quantity - 1)}
               className="w-8 h-8 border-2 border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
               disabled={item.quantity <= 1}
             >
@@ -66,14 +66,14 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
             </span>
 
             <button
-              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+              onClick={() => onUpdateQuantity(item.uid, item.quantity + 1)}
               className="w-8 h-8 border-2 border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
             >
               <Plus className="w-4 h-4 text-gray-600" />
             </button>
 
             <button
-              onClick={() => onRemove(item.id)}
+              onClick={() => onRemove(item.uid)}
               className="text-red-500 hover:text-red-700 p-1"
             >
               <Trash2 className="w-5 h-5" />

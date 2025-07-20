@@ -1,4 +1,4 @@
-import type { MenuItem, MenuCategories } from "../shared/restaurant-types";
+import type { MenuItem, MenuCategories } from "../shared/restaurant-types.ts";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,7 +26,7 @@ export async function fetchMenuItems(restaurantId: number): Promise<MenuCategori
 
   const data: ProductoAPI[] = await res.json();
 
-  // Paso 1: Agrupar productos por categoría y subcategoría con ID
+  // Paso 1: Agrupar productos por categoría y subcategoría con ID me permitira colocar la categoria 1 como primera
   const grouped: Record<
     number,
     {
@@ -41,7 +41,8 @@ export async function fetchMenuItems(restaurantId: number): Promise<MenuCategori
     const subNombre = producto.subcategoria.nombre;
 
     const menuItem: MenuItem = {
-      id: producto.id_producto.toString(),
+      id: producto.id_producto,
+      uid: "",
       name: producto.nombre,
       description: producto.descripcion,
       price: parseFloat(producto.precio),

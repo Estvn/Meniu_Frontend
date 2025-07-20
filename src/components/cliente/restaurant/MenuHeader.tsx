@@ -11,12 +11,13 @@ interface HeaderProps {
   totalItems: number;
   hasActiveOrders?: boolean;
   hasOrdersWithCancelTime?: boolean;
+  numeroMesa: number;
 }
 
 // totalItems: Cantidad total de productos en el carrito
 // onNavigate: Función para navegar a la página del carrito
 
-export function Header({ totalItems,  hasActiveOrders = false, hasOrdersWithCancelTime = false, }: HeaderProps) {
+export function Header({ totalItems,  hasActiveOrders = false, hasOrdersWithCancelTime = false, numeroMesa }: HeaderProps) {
    const navigate = useNavigate();
   const [isRequestBillModalOpen, setIsRequestBillModalOpen] = useState(false);
   return (
@@ -27,7 +28,7 @@ export function Header({ totalItems,  hasActiveOrders = false, hasOrdersWithCanc
 
       <div className="flex items-center gap-3">
         <button className="px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
-          Mesa 1
+          Mesa {numeroMesa}
         </button>
         <button onClick={() => setIsRequestBillModalOpen(true)}
           className="p-2 relative hover:bg-gray-100 rounded-full transition-colors"

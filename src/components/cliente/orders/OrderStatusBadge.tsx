@@ -1,28 +1,28 @@
 import type { OrderStatus } from "../shared/order-types.ts";
 
 interface OrderStatusBadgeProps {
-  status: OrderStatus;
+  estado: OrderStatus;
 }
 
-export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
-  const getStatusConfig = (status: OrderStatus) => {
-    switch (status) {
-      case "pendiente":
+export function OrderStatusBadge({estado}: OrderStatusBadgeProps) {
+  const getStatusConfig = (estado: OrderStatus) => {
+    switch (estado) {
+      case "PENDIENTE":
         return {
           label: "Pendiente",
           className: "bg-yellow-100 text-yellow-800 border-yellow-300",
         };
-      case "preparando":
+      case "PREPARANDO":
         return {
           label: "Preparando",
           className: "bg-orange-100 text-orange-800 border-orange-300",
         };
-      case "listo":
+      case "LISTO":
         return {
           label: "Listo",
           className: "bg-green-100 text-green-800 border-green-300",
         };
-      case "cancelado":
+      case "CANCELADO":
         return {
           label: "Cancelado",
           className: "bg-red-100 text-red-800 border-red-300",
@@ -35,7 +35,7 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
     }
   };
 
-  const config = getStatusConfig(status);
+  const config = getStatusConfig(estado);
 
   return (
     <span

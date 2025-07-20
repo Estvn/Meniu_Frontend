@@ -49,7 +49,7 @@ export function OrderConfirmationModal({
 
         <div className="border-t border-gray-200 pt-4 mb-6">
           <h3 className="font-semibold text-gray-900 mb-3">
-            Resumen del Pedido - Mesa 1
+            Resumen del Pedido - Mesa {localStorage.getItem("id_mesa")}
           </h3>
 
           <div className="space-y-2 mb-4">

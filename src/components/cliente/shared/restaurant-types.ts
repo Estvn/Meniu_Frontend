@@ -3,7 +3,8 @@
  */
 
 export interface MenuItem {
-    id: string;
+    id: number;
+    uid: string; // <-- identificador único para el carrito
     name: string;
     description: string;
     price: number;
@@ -17,7 +18,7 @@ export interface MenuItem {
   }
   
   export interface Complement {
-    id: string;
+    id: number;
     name: string;
     price: number;
     selected: boolean;

@@ -1,10 +1,8 @@
-import { useEffect ,useState } from "react";
+import { useEffect, useState } from "react";
 import type { MenuItem, ViewType, MenuCategories } from "../../components/cliente/shared/restaurant-types";
 import { useCart } from "../../components/cliente/hooks/useCart";
 import { useMenuNavigation } from "../../components/cliente/hooks/useMenuNavigation";
 import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop";
-//import { menuCategories } from "../../components/cliente/menuData";
-//import { fetchMenuCategories } from "../../components/cliente/fetch/categories.ts";
 import { fetchMenuItems } from "../../components/cliente/fetch/products.ts";
 
 import { Header } from "../../components/cliente/restaurant/MenuHeader";
@@ -15,7 +13,14 @@ import { MenuGrid } from "../../components/cliente/restaurant/MenuGrid";
 import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop";
 import ProductDetailPage from "./ProductDetails";
 
+//Para obtener el restaurante y mesa desde la URL
+import { useSearchParams } from "react-router-dom";
+
+
 export default function ClienteMenu() {
+  const [searchParams] = useSearchParams();
+  const restauranteId = Number(searchParams.get("id_restaurante"));
+  const numeroMesa = Number(searchParams.get("id_mesa"));
   const [menuCategories, setMenuCategories] = useState<MenuCategories>({});
   const [loading, setLoading] = useState(true);
 
@@ -28,16 +33,23 @@ export default function ClienteMenu() {
   const { showScrollTop, scrollToTop } = useScrollToTop();
 
   useEffect(() => {
-  fetchMenuItems(1)
-    .then((data) => {
-      setMenuCategories(data);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Error al cargar productos:", err);
-      setLoading(false);
-    });
-}, []);
+
+    // Guarda en localStorage si vienen en la URL
+    if (restauranteId && numeroMesa) {
+      localStorage.setItem("id_restaurante", restauranteId.toString());
+      localStorage.setItem("id_mesa", numeroMesa.toString());
+    }
+
+    fetchMenuItems(restauranteId)
+      .then((data) => {
+        setMenuCategories(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error al cargar productos:", err);
+        setLoading(false);
+      });
+  }, [restauranteId, numeroMesa]);
 
 
   const {
@@ -48,7 +60,7 @@ export default function ClienteMenu() {
     getCurrentItems,
   } = useMenuNavigation(menuCategories);
 
-   if (loading) {
+  if (loading) {
     return <div className="p-4 text-center text-gray-500">Cargando menú...</div>;
   }
 
@@ -81,7 +93,7 @@ export default function ClienteMenu() {
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {/* Header con el total de items en el carrito */}
-      <Header totalItems={totalItems} /> 
+      <Header totalItems={totalItems} numeroMesa={numeroMesa} />
       <RestaurantInfo />
       <MenuNavigation />
 
