@@ -1,3 +1,5 @@
+import type {Restaurante} from "./restaurant-types.ts";
+
 export type OrderStatus = "PENDIENTE" | "PREPARANDO" | "LISTO" | "CANCELADO";
 
 export interface OrderItem {
@@ -16,10 +18,7 @@ export interface Mesa {
   estado_mesa?: string;
 }
 
-export interface Restaurante {
-  id_restaurante: number;
-  nombre: string;
-}
+
 
 export interface Order {
   id_orden: number;

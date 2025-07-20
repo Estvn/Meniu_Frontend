@@ -1,0 +1,21 @@
+// components/cliente/fetch/restaurants.ts
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+export interface Restaurante {
+  id_restaurante: number;
+  nombre: string;
+  direccion?: string;
+  telefono?: string;
+  logo?: string;
+}
+
+export async function getRestaurantById(restauranteId: number): Promise<Restaurante> {
+  const res = await fetch(`${API_URL}/restaurantes/obtener/${restauranteId}`);
+
+  if (!res.ok) {
+    throw new Error("Error al obtener el restaurante");
+  }
+
+  return await res.json();
+}

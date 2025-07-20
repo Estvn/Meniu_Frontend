@@ -33,6 +33,19 @@ export interface MenuItem {
   
   export type ViewType = "menu" | "productDetail";
 
+  export interface Restaurante {
+  id_restaurante: number;
+  nombre: string;
+  email?: string;
+  direccion?: string;
+  telefono?: string;
+  logo_url?: string;
+  descripcion?: string;
+  activo?: boolean;
+  fechaCreacion?: string;
+}
+
+
   export interface CategoriaBackend {
   id_categoria: number;
   nombre: string;
@@ -42,6 +55,9 @@ export interface MenuItem {
     nombre: string;
     activa: number;
   }[];
+
+
+  
 }
 
   

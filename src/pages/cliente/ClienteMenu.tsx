@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import type { MenuItem, ViewType, MenuCategories } from "../../components/cliente/shared/restaurant-types";
-import { useCart } from "../../components/cliente/hooks/useCart";
-import { useMenuNavigation } from "../../components/cliente/hooks/useMenuNavigation";
-import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop";
+import type { MenuItem, ViewType, MenuCategories, Restaurante } from "../../components/cliente/shared/restaurant-types.ts";
+import { useCart } from "../../components/cliente/hooks/useCart.ts";
+import { useMenuNavigation } from "../../components/cliente/hooks/useMenuNavigation.ts";
+import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop.ts";
 import { fetchMenuItems } from "../../components/cliente/fetch/products.ts";
+import { getRestaurantById } from "../../components/cliente/fetch/restaurant.ts"; 
 
-import { Header } from "../../components/cliente/restaurant/MenuHeader";
-import { RestaurantInfo } from "../../components/cliente/restaurant/RestaurantInfoCard";
-import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation";
-import { CategoryNavigation } from "../../components/cliente/restaurant/CategoryNavigation";
-import { MenuGrid } from "../../components/cliente/restaurant/MenuGrid";
-import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop";
-import ProductDetailPage from "./ProductDetails";
+
+import { Header } from "../../components/cliente/restaurant/MenuHeader.tsx";
+import { RestaurantInfo } from "../../components/cliente/restaurant/RestaurantInfoCard.tsx";
+import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation.tsx";
+import { CategoryNavigation } from "../../components/cliente/restaurant/CategoryNavigation.tsx";
+import { MenuGrid } from "../../components/cliente/restaurant/MenuGrid.tsx";
+import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop.tsx";
+import ProductDetailPage from "./ProductDetails.tsx";
 
 //Para obtener el restaurante y mesa desde la URL
 import { useSearchParams } from "react-router-dom";
@@ -22,6 +24,8 @@ export default function ClienteMenu() {
   const restauranteId = Number(searchParams.get("id_restaurante"));
   const numeroMesa = Number(searchParams.get("id_mesa"));
   const [menuCategories, setMenuCategories] = useState<MenuCategories>({});
+  const [restaurantInfo, setRestaurantInfo] = useState<Restaurante | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   // SelectItem almacena el producto actualmente seleccionado
@@ -33,24 +37,28 @@ export default function ClienteMenu() {
   const { showScrollTop, scrollToTop } = useScrollToTop();
 
   useEffect(() => {
+  if (restauranteId && numeroMesa) {
+    localStorage.setItem("id_restaurante", restauranteId.toString());
+    localStorage.setItem("id_mesa", numeroMesa.toString());
+  }
 
-    // Guarda en localStorage si vienen en la URL
-    if (restauranteId && numeroMesa) {
-      localStorage.setItem("id_restaurante", restauranteId.toString());
-      localStorage.setItem("id_mesa", numeroMesa.toString());
+  const fetchData = async () => {
+    try {
+      const [menu, restaurant] = await Promise.all([
+        fetchMenuItems(restauranteId),
+        getRestaurantById(restauranteId),
+      ]);
+      setMenuCategories(menu);
+      setRestaurantInfo(restaurant);
+    } catch (err) {
+      console.error("Error al cargar datos:", err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchMenuItems(restauranteId)
-      .then((data) => {
-        setMenuCategories(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error al cargar productos:", err);
-        setLoading(false);
-      });
-  }, [restauranteId, numeroMesa]);
-
+  fetchData();
+}, [restauranteId, numeroMesa]);
 
   const {
     activeCategory,
@@ -94,7 +102,7 @@ export default function ClienteMenu() {
     <div className="min-h-screen bg-gray-50 pt-16">
       {/* Header con el total de items en el carrito */}
       <Header totalItems={totalItems} numeroMesa={numeroMesa} />
-      <RestaurantInfo />
+      {restaurantInfo && <RestaurantInfo restaurant={restaurantInfo} />}
       <MenuNavigation />
 
       <CategoryNavigation
