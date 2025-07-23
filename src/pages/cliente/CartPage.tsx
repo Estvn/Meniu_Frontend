@@ -43,7 +43,7 @@ export default function CartPage({
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const restauranteId = Number(localStorage.getItem("id_restaurante") );
-const mesaId = Number(localStorage.getItem("id_mesa") );
+  const mesaId = Number(localStorage.getItem("id_mesa") );
 
   const handlePlaceOrder = () => {
   
@@ -51,33 +51,58 @@ const mesaId = Number(localStorage.getItem("id_mesa") );
   };
 
   const handleConfirmOrder = async () => {
-  try {
-    const nuevaOrden = await createOrder(cart, mesaId, restauranteId, "");
-
-    // Guardar en localStorage por mesa
-    const key = `orders_mesa_${mesaId}`;
-    const existingOrders = JSON.parse(localStorage.getItem(key) || "[]");
-    const updatedOrders = [nuevaOrden, ...existingOrders];
-    localStorage.setItem(key, JSON.stringify(updatedOrders));
-
-    toast.success("¡Pedido enviado a la cocina!", {
-      description: `Mesa ${mesaId} - ${cart.length} productos`,
-      duration: 3000,
-      style: {
-        backgroundColor: "#10b981",
-        color: "white",
-        fontWeight: "500",
-      },
-    });
-
-    onClearCart();
-    setShowConfirmation(false);
-    navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}`);
-  } catch (error) {
-    toast.error("Error al enviar el pedido");
-    console.error(error);
-  }
-};
+    // Validar IDs
+    if (!Number.isFinite(mesaId) || !Number.isFinite(restauranteId) || mesaId <= 0 || restauranteId <= 0) {
+      toast.error("Error: Restaurante o mesa no válidos. No se puede crear la orden.");
+      return;
+    }
+    // Crear pedido pendiente local
+    const timestamp_creacion = Date.now();
+    const estimateTime = timestamp_creacion + 3 * 60 * 1000; // 3 minutos en ms
+    // Construir items para el pedido
+    const items = cart.map((item, idx) => ({
+      id_orden_item: idx + 1, // temporal, se reemplazará al enviar al backend
+      id_producto: item.id,
+      nombre_producto: item.name,
+      cantidad: item.quantity,
+      precio_unitario: item.price,
+      notas: item.instructions || ""
+    }));
+    // Construir pedido pendiente
+    const pedidoPendiente = {
+      id_orden: null, // aún no existe en backend
+      estado: "PENDIENTE",
+      fecha: new Date(timestamp_creacion).toISOString().split('T')[0],
+      hora_confirmacion: new Date(timestamp_creacion).toLocaleTimeString(),
+      subtotal,
+      impuestos: isv,
+      total: totalPrice,
+      solicitud_pago: false,
+      notas: "",
+      restaurante: { id_restaurante: restauranteId, nombre: "" }, // nombre se puede actualizar luego
+      mesa: { id_mesa: mesaId, numero_mesa: mesaId },
+      items,
+      timestamp_creacion,
+      estimateTime
+    };
+      // Guardar en localStorage por mesa
+      const key = `orders_mesa_${mesaId}`;
+      const existingOrders = JSON.parse(localStorage.getItem(key) || "[]");
+    const updatedOrders = [pedidoPendiente, ...existingOrders];
+      localStorage.setItem(key, JSON.stringify(updatedOrders));
+    toast.success("¡Pedido agregado a Mis pedidos!", {
+      description: `Tienes 3 minutos para cancelar antes de enviar a cocina.`,
+        duration: 3000,
+        style: {
+          backgroundColor: "#10b981",
+          color: "white",
+          fontWeight: "500",
+        },
+      });
+      onClearCart();
+      setShowConfirmation(false);
+    navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}`); // Redirigir a la ruta original
+  };
 
 
   const handleClearCart = () => {

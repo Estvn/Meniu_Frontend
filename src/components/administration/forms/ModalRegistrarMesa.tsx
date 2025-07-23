@@ -57,6 +57,7 @@ export function ModalRegistrarMesa({ onClose, onSubmit, onCancel }: ModalRegistr
         },
         body: JSON.stringify(payload),
       });
+
       setMesaNo("");
       if (onSubmit) onSubmit(mesaNo);
       if (onClose) onClose();

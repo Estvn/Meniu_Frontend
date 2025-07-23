@@ -20,8 +20,8 @@ export async function createOrder(
   notas: string
 ) {
   const payload: CreateOrderPayload = {
-    id_mesa: idMesa,
-    id_restaurante: idRestaurante,
+    id_mesa: Number(idMesa),
+    id_restaurante: Number(idRestaurante),
     notas,
     items: cart.map((item) => ({
       id_producto: Number(item.id),
@@ -35,10 +35,42 @@ export async function createOrder(
     body: JSON.stringify(payload),
   });
 
-console.log("Payload que se enviará:", payload);
+  console.log("Payload que se enviará:", payload);
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Respuesta del backend:", errorText);
     throw new Error("Error al crear el pedido");
   }
 
+  return await response.json();
+}
+
+export async function fetchOrderDetails(id_orden: number) {
+  const response = await fetch(`${API_URL}/orders/detalles-orden/${id_orden}`);
+  if (!response.ok) {
+    throw new Error("Error al obtener los detalles de la orden");
+  }
+  return await response.json();
+}
+
+export async function solicitarPago(id_orden: number) {
+  const response = await fetch(`${API_URL}/orders/${id_orden}/solicitar-pago`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) {
+    throw new Error("Error al solicitar el pago");
+  }
+  return await response.json();
+}
+
+export async function cancelarPedido(id_orden: number) {
+  const response = await fetch(`${API_URL}/orders/${id_orden}/cancelar`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) {
+    throw new Error("Error al cancelar el pedido");
+  }
   return await response.json();
 }

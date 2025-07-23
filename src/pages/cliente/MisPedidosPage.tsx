@@ -4,15 +4,17 @@ import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop.ts
 import { ScrollToTop } from "../../components/cliente/restaurant/ScrollToTop.tsx";
 import { Header } from "../../components/cliente/restaurant/MenuHeader.tsx";
 import { RestaurantInfo } from "../../components/cliente/restaurant/RestaurantInfoCard.tsx";
+import { getRestaurantById } from "../../components/cliente/fetch/restaurant.ts";
 import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigation.tsx";
 import { OrderSummary } from "../../components/cliente/orders/OrderSummary.tsx";
 import { OrderCard } from "../../components/cliente/orders/OrderCart.tsx";
 import { toast } from "sonner";
 import type { Order } from "../../components/cliente/shared/order-types.ts";
+import type { Restaurante } from "../../components/cliente/shared/restaurant-types.ts";
 
 interface MisPedidosPageProps {
   orders: Order[];
-  onCancelOrder: (orderId: number) => void;
+  onCancelOrder: (orderId: number | undefined) => void;
   totalActiveAmount: number;
   activeOrdersCount: number;
   totalCartItems: number;
@@ -27,17 +29,29 @@ export default function MisPedidosPage({
 }: MisPedidosPageProps) {
   const navigate = useNavigate();
   const [numeroMesa, setNumeroMesa] = useState<number | null>(null);
+  const [restaurante, setRestaurante] = useState<Restaurante | null>(null);
+  const restauranteId = localStorage.getItem("id_restaurante");
+  const mesaId = localStorage.getItem("id_mesa");
 
   const { showScrollTop, scrollToTop } = useScrollToTop();
 
   useEffect(() => {
-    const storedMesa = localStorage.getItem("id_mesa");
-    if (storedMesa) {
-      setNumeroMesa(Number(storedMesa));
-    }
-  }, []);
+    const storedMesa = mesaId;
+    const storedRestaurante = restauranteId;
 
-  const handleCancelOrder = (orderId: number) => {
+    if (storedMesa) setNumeroMesa(Number(storedMesa));
+    if (storedRestaurante) {
+      const restauranteId = Number(storedRestaurante);
+
+      getRestaurantById(restauranteId)
+        .then(setRestaurante)
+        .catch(() => {
+          toast.error("Error al cargar el restaurante");
+        });
+    }
+  }, [restauranteId, mesaId]);
+
+  const handleCancelOrder = (orderId: number | undefined) => {
     onCancelOrder(orderId);
 
     toast.error("Pedido cancelado", {
@@ -46,18 +60,23 @@ export default function MisPedidosPage({
     });
   };
 
+  // Calcular si hay pedidos activos (PENDIENTE, PREPARANDO o LISTO)
+  const hasActiveOrders = orders.some(
+    (order) => order.estado === "PENDIENTE" || order.estado === "PREPARANDO" || order.estado === "ENTREGADA"
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {numeroMesa !== null && (
-        <Header totalItems={totalCartItems} numeroMesa={numeroMesa} />
+        <Header totalItems={totalCartItems} numeroMesa={numeroMesa} hasActiveOrders={hasActiveOrders} />
       )}
-      <RestaurantInfo />
+      {restaurante && <RestaurantInfo restaurant={restaurante} />}
       <MenuNavigation />
 
       <div className="p-4">
         {/* Resumen de pedidos activos */}
         <OrderSummary
-          totalAmount={totalActiveAmount}
+          totalAmount={Number(totalActiveAmount) || 0}
           activeOrdersCount={activeOrdersCount}
         />
 
@@ -65,9 +84,9 @@ export default function MisPedidosPage({
         <div className="space-y-4">
           {orders.map((order) => (
             <OrderCard
-              key={order.id_orden}
+              key={order.id_orden ?? order.timestamp_creacion}
               order={order}
-              onCancelOrder={() => handleCancelOrder(order.id_orden)}
+              onCancelOrder={() => handleCancelOrder(order.id_orden !== null ? order.id_orden : order.timestamp_creacion)}
             />
           ))}
         </div>
@@ -85,7 +104,7 @@ export default function MisPedidosPage({
               Cuando hagas un pedido, aparecerá aquí
             </p>
             <button
-              onClick={() => navigate("/cliente")}
+              onClick={() => navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}`)}
               className="px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
             >
               Ver Menú

@@ -1,6 +1,6 @@
 import type {Restaurante} from "./restaurant-types.ts";
 
-export type OrderStatus = "PENDIENTE" | "PREPARANDO" | "LISTO" | "CANCELADO";
+export type OrderStatus = "PENDIENTE" | "PREPARANDO" | "ENTREGADA" | "CANCELADA" | "PAGADA";
 
 export interface OrderItem {
   id_orden_item: number;
@@ -21,8 +21,8 @@ export interface Mesa {
 
 
 export interface Order {
-  id_orden: number;
-  estado: OrderStatus;
+  id_orden: number | null;
+  estado: OrderStatus | string;
   fecha: string;
   hora_confirmacion: string;
   hora_lista?: string | null;
@@ -32,9 +32,10 @@ export interface Order {
   total: number;
   solicitud_pago: boolean;
   notas: string;
-
   restaurante: Restaurante;
   mesa: Mesa;
-
   items: OrderItem[];
+  // Campos para pedidos pendientes locales
+  timestamp_creacion?: number;
+  estimateTime?: number;
 }

@@ -2,14 +2,22 @@ import { useState, useEffect } from "react";
 import type { MenuItem, Complement, CartItem } from "../shared/restaurant-types.ts";
 
 export function useCart() {
+  // Obtener restaurante y mesa SIEMPRE de localStorage
+  const restauranteId = localStorage.getItem("id_restaurante");
+  const mesaId = localStorage.getItem("id_mesa");
+  const CART_KEY = restauranteId && mesaId ? `cart_${restauranteId}_${mesaId}` : null;
+
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const stored = localStorage.getItem("cart");
+    if (!CART_KEY) return [];
+    const stored = localStorage.getItem(CART_KEY);
     return stored ? JSON.parse(stored) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    if (CART_KEY) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+  }, [cart, CART_KEY]);
 
   const addToCart = (
     item: MenuItem,
@@ -17,6 +25,10 @@ export function useCart() {
     instructions: string = "",
     quantity: number = 1
   ) => {
+    if (!CART_KEY) {
+      alert("No se ha seleccionado restaurante o mesa. No se puede agregar al carrito.");
+      return;
+    }
     const complementsTotal = complements.reduce((sum, comp) => sum + comp.price, 0);
     const totalPrice = item.price + complementsTotal;
 
@@ -70,7 +82,7 @@ export function useCart() {
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem("cart");
+    if (CART_KEY) localStorage.removeItem(CART_KEY);
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);

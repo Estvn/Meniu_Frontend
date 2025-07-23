@@ -81,7 +81,18 @@ export default function ProductDetailPage({
       <div className="flex-1 overflow-y-auto pb-32">
         {/* Product image with back button overlay */}
         <div className="h-64 bg-gray-300 relative overflow-hidden mx-4 mt-4 rounded-lg">
-          <div className="absolute inset-0 bg-gray-400 flex items-center justify-center">
+          {item.image ? (
+            <img
+              src={`https://corsproxy.io/?${encodeURIComponent(item.image)}`}
+              alt={item.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <div className={`absolute inset-0 bg-gray-400 flex items-center justify-center ${item.image ? 'hidden' : ''}`}>
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
               <div className="w-8 h-8 border-2 border-gray-400 rounded"></div>
             </div>

@@ -1,5 +1,6 @@
 import { X, CreditCard, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { solicitarPago, fetchOrderDetails } from "../fetch/orders.ts";
 
 interface RequestBillModalProps {
   isOpen: boolean;
@@ -21,11 +22,11 @@ export function RequestBillModal({
   const hasTimeToCancel = hasOrdersWithCancelTime;
   const canRequest = hasActiveOrders && !hasOrdersWithCancelTime;
 
-  const handleRequestBill = () => {
+  const handleRequestBill = async () => {
     if (noOrders) {
       toast.error("No tienes pedidos activos", {
         description:
-          "Necesitas hacer al menos un pedido para solicitar la cuenta",
+          "Necesitas hacer al menos un pedido para solicitar el pago",
         duration: 4000,
       });
       onClose();
@@ -42,8 +43,36 @@ export function RequestBillModal({
       return;
     }
 
-    // Success case
-    toast.success("¡Solicitud enviada!", {
+    // Obtener los ids de las órdenes de la mesa
+    const mesaId = localStorage.getItem("id_mesa");
+    let orderIds = [];
+    if (mesaId) {
+      const allOrders = JSON.parse(localStorage.getItem(`orders_mesa_${mesaId}`) || "[]");
+      orderIds = allOrders.map((o: any) => o.id_orden || o.id);
+    }
+
+    console.log("IDs de las órdenes a consultar:", orderIds);
+
+    // Consultar el backend para obtener el estado real de cada pedido
+    const detalles = await Promise.all(orderIds.map((id: number) => fetchOrderDetails(id).catch(() => null)));
+    detalles.forEach((order: any) => {
+      if (order) {
+        console.log(`Orden ID: ${order.id_orden}, Estado: ${order.estado}`);
+      }
+    });
+    const entregadas = detalles.filter(
+      (order: any) => order && order.estado === "ENTREGADA"
+    );
+
+    if (entregadas.length === 0) {
+      toast.error("No hay pedidos entregados para solicitar pago");
+      onClose();
+      return;
+    }
+
+    try {
+      await Promise.all(entregadas.map((order: any) => solicitarPago(order.id_orden)));
+      toast.success("¡Solicitud de pago enviada!", {
       description: "El mesero se dirigirá a tu mesa para procesar el pago",
       duration: 4000,
       style: {
@@ -52,6 +81,9 @@ export function RequestBillModal({
         fontWeight: "500",
       },
     });
+    } catch (error) {
+      toast.error("Error al solicitar el pago");
+    }
     onClose();
   };
 
