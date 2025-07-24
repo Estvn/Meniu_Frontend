@@ -22,7 +22,7 @@ import { useSearchParams } from "react-router-dom";
 export default function ClienteMenu() {
   const [searchParams] = useSearchParams();
   const restauranteId = Number(searchParams.get("id_restaurante"));
-  const numeroMesa = Number(searchParams.get("id_mesa"));
+  const numeroMesa = Number(searchParams.get("num_mesa"));
   const [menuCategories, setMenuCategories] = useState<MenuCategories>({});
   const [restaurantInfo, setRestaurantInfo] = useState<Restaurante | null>(null);
 
@@ -39,7 +39,8 @@ export default function ClienteMenu() {
   useEffect(() => {
   if (restauranteId && numeroMesa) {
     localStorage.setItem("id_restaurante", restauranteId.toString());
-    localStorage.setItem("id_mesa", numeroMesa.toString());
+    localStorage.setItem("id_mesa", searchParams.get("id_mesa") || "");
+    localStorage.setItem("num_mesa", numeroMesa.toString());
   }
 
   const fetchData = async () => {

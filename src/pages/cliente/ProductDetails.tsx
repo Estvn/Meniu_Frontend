@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Minus, Plus } from "lucide-react";
 import type { MenuItem, Complement } from "../../components/cliente/shared/restaurant-types.ts";
 import { toast } from "sonner";
+import { fetchComplementos } from "../../components/cliente/fetch/products.ts";
 
 interface ProductDetailPageProps {
   item: MenuItem;
@@ -23,20 +24,27 @@ export default function ProductDetailPage({
 }: ProductDetailPageProps) {
   const [quantity, setQuantity] = useState(1);
   const [instructions, setInstructions] = useState("");
-  const [complements, setComplements] = useState<Complement[]>([
-    { id: "queso-extra", name: "Queso extra", price: 2.5, selected: false },
-    { id: "panceta-extra", name: "Panceta extra", price: 3.0, selected: false },
-    {
-      id: "aceite-trufa",
-      name: "Aceite de trufa",
-      price: 4.0,
-      selected: false,
-    },
-  ]);
+  const [complements, setComplements] = useState<Complement[]>([]);
+  const [loadingComplements, setLoadingComplements] = useState(true);
 
+  useEffect(() => {
+    setLoadingComplements(true);
+    fetchComplementos(item.id)
+      .then((data) => {
+        const comps = Array.isArray(data.complementos) ? data.complementos.map((c: any) => ({
+          id: c.id,
+          name: c.nombre || c.name || "Complemento",
+          price: Number(c.precio ?? c.price ?? 0),
+          selected: false,
+        })) : [];
+        setComplements(comps);
+      })
+      .catch(() => setComplements([]))
+      .finally(() => setLoadingComplements(false));
+  }, [item.id]);
 
   // FUncion que Permite alterar el estado selected de un complemento especfico
-  const toggleComplement = (complementId: string) => {
+  const toggleComplement = (complementId: number) => {
     setComplements((prev) =>
       prev.map((comp) =>
         comp.id === complementId ? { ...comp, selected: !comp.selected } : comp,
@@ -118,42 +126,43 @@ export default function ProductDetailPage({
         </div>
 
         {/* Complements section */}
-        <div className="mx-4 mt-8">
-          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-              Complementos
-            </h2>
-
-            <div className="space-y-4">
-              {complements.map((complement) => (
-                <div
-                  key={complement.id}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <div className="font-semibold text-gray-900">
-                      {complement.name}
-                    </div>
-                    <div className="text-gray-600">
-                      +L{complement.price.toFixed(2)}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => toggleComplement(complement.id)}
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${complement.selected
-                        ? "border-orange-500 bg-orange-500"
-                        : "border-orange-500 bg-white"
-                      }`}
+        {!loadingComplements && complements.length > 0 && (
+          <div className="mx-4 mt-8">
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                Complementos
+              </h2>
+              <div className="space-y-4">
+                {complements.map((complement) => (
+                  <div
+                    key={complement.id}
+                    className="flex items-center justify-between"
                   >
-                    {complement.selected && (
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    )}
-                  </button>
-                </div>
-              ))}
+                    <div>
+                      <div className="font-semibold text-gray-900">
+                        {complement.name}
+                      </div>
+                      <div className="text-gray-600">
+                        +L{complement.price.toFixed(2)}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleComplement(complement.id)}
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${complement.selected
+                          ? "border-orange-500 bg-orange-500"
+                          : "border-orange-500 bg-white"
+                        }`}
+                    >
+                      {complement.selected && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Special instructions */}
         <div className="mx-4 mt-6 mb-8">

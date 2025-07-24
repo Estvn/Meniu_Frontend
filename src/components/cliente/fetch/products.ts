@@ -77,3 +77,12 @@ export async function fetchMenuItems(restaurantId: number): Promise<MenuCategori
 
   return final;
 }
+
+export async function fetchComplementos(productId: number) {
+  const API_URL = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${API_URL}/productos/complementos/${productId}`);
+  if (!response.ok) {
+    throw new Error('Error al obtener los complementos');
+  }
+  return await response.json();
+}

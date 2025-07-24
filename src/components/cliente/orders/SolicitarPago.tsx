@@ -122,7 +122,7 @@ export function RequestBillModal({
     return {
       title: "Solicitar la Cuenta",
       description:
-        "¿Deseas que el mesero venga a tu Mesa 1 para procesar el pago?",
+        "¿Deseas que el mesero venga a tu Mesa para procesar el pago?",
       buttonText: "Sí, Solicitar la Cuenta",
       buttonColor: "bg-pink-500 hover:bg-pink-600",
       iconColor: "text-pink-500",

@@ -37,7 +37,7 @@ export function OrderSummary({
           <p className="text-2xl font-bold text-gray-900">
             L{totalAmount.toFixed(2)}
           </p>
-          <p className="text-sm text-orange-700">Mesa 1</p>
+          <p className="text-sm text-orange-700">Mesa {localStorage.getItem("num_mesa")}</p>
         </div>
       </div>
     </div>

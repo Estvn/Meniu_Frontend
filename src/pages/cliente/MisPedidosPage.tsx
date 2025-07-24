@@ -32,14 +32,15 @@ export default function MisPedidosPage({
   const [restaurante, setRestaurante] = useState<Restaurante | null>(null);
   const restauranteId = localStorage.getItem("id_restaurante");
   const mesaId = localStorage.getItem("id_mesa");
+  const numMesa = localStorage.getItem("num_mesa");
 
   const { showScrollTop, scrollToTop } = useScrollToTop();
 
   useEffect(() => {
-    const storedMesa = mesaId;
+    const storedNumMesa = numMesa;
     const storedRestaurante = restauranteId;
 
-    if (storedMesa) setNumeroMesa(Number(storedMesa));
+    if (storedNumMesa) setNumeroMesa(Number(storedNumMesa));
     if (storedRestaurante) {
       const restauranteId = Number(storedRestaurante);
 
@@ -49,7 +50,7 @@ export default function MisPedidosPage({
           toast.error("Error al cargar el restaurante");
         });
     }
-  }, [restauranteId, mesaId]);
+  }, [restauranteId, numMesa]);
 
   const handleCancelOrder = (orderId: number | undefined) => {
     onCancelOrder(orderId);
@@ -104,7 +105,7 @@ export default function MisPedidosPage({
               Cuando hagas un pedido, aparecerá aquí
             </p>
             <button
-              onClick={() => navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}`)}
+              onClick={() => navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}&num_mesa=${numMesa}`)}
               className="px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
             >
               Ver Menú

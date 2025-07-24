@@ -11,7 +11,6 @@ import { ClearCartButton } from "../../components/cliente/cart/ClearCartButton.t
 import { CartSummary } from "../../components/cliente/cart/CartSummary.tsx";
 import { CartActions } from "../../components/cliente/cart/CartActions.tsx";
 import { toast } from "sonner";
-import { createOrder } from "../../components/cliente/fetch/orders.ts";
 
 // cart contiene los productos del carrito
 // totalPrice es el precio total del carrito
@@ -44,6 +43,7 @@ export default function CartPage({
 
   const restauranteId = Number(localStorage.getItem("id_restaurante") );
   const mesaId = Number(localStorage.getItem("id_mesa") );
+  const numMesa = localStorage.getItem("num_mesa");
 
   const handlePlaceOrder = () => {
   
@@ -68,6 +68,11 @@ export default function CartPage({
       precio_unitario: item.price,
       notas: item.instructions || ""
     }));
+    // Concatenar todas las instrucciones especiales
+    const notas = cart
+      .map((item) => item.instructions?.trim())
+      .filter((txt) => !!txt)
+      .join(" | ");
     // Construir pedido pendiente
     const pedidoPendiente = {
       id_orden: null, // aún no existe en backend
@@ -78,7 +83,7 @@ export default function CartPage({
       impuestos: isv,
       total: totalPrice,
       solicitud_pago: false,
-      notas: "",
+      notas,
       restaurante: { id_restaurante: restauranteId, nombre: "" }, // nombre se puede actualizar luego
       mesa: { id_mesa: mesaId, numero_mesa: mesaId },
       items,
@@ -101,7 +106,7 @@ export default function CartPage({
       });
       onClearCart();
       setShowConfirmation(false);
-    navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}`); // Redirigir a la ruta original
+    navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}&num_mesa=${numMesa}`); // Redirigir a la ruta original
   };
 
 
@@ -115,7 +120,8 @@ export default function CartPage({
   const handleBackToMenu = () => {
     const restauranteId = localStorage.getItem("id_restaurante");
     const mesaId = localStorage.getItem("id_mesa");
-    navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}`);
+    const numMesa = localStorage.getItem("num_mesa");
+    navigate(`/cliente?id_restaurante=${restauranteId}&id_mesa=${mesaId}&num_mesa=${numMesa}`);
   };
 
   return (

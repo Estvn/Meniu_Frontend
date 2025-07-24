@@ -1,9 +1,7 @@
 import type { Order } from "../shared/order-types.ts";
 import { OrderStatusBadge } from "./OrderStatusBadge.tsx";
 import { useCountdown } from "../hooks/useCountdown.ts";
-import { solicitarPago } from "../fetch/orders.ts";
-// Agregar función para cancelar pedido
-import { cancelarPedido } from "../fetch/orders.ts";
+import type { OrderStatus } from "../shared/order-types.ts";
 import { useState } from "react";
 import { Modal } from "../../administration/forms/Modal";
 
@@ -71,12 +69,12 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
     <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
       <div className="flex justify-between items-start mb-3">
         <div>
-          <OrderStatusBadge estado={order.estado } />
+          <OrderStatusBadge estado={order.estado as OrderStatus} />
           <h3 className="font-semibold text-gray-900 mt-2">
             Pedido #{order.id_orden}
           </h3>
           <p className="text-sm text-gray-500">
-            Mesa {order.mesa?.numero_mesa ?? "?"}
+            Mesa {localStorage.getItem("num_mesa")}
           </p>
           <p className="text-sm text-gray-400 mt-1">
             {new Date(order.fecha).toLocaleString()}
@@ -90,6 +88,12 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
       </div>
 
       <p className="text-sm text-gray-600 mb-3">{getStatusMessage()}</p>
+
+      {order.notas && (
+        <div className="mb-2 p-2 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded">
+          <span className="font-semibold">Notas:</span> {order.notas}
+        </div>
+      )}
 
       <div className="space-y-2 mb-3">
         {order.items.map((item) => (
