@@ -36,9 +36,15 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
             );
             if (selectedComps.length > 0) {
               return (
-                <p className="text-gray-600 text-sm leading-tight">
-                  {selectedComps.map((comp) => comp.name).join(", ")}
-                </p>
+                <div className="mt-1 ml-2">
+                  <ul className="list-disc ml-4 text-xs text-gray-600">
+                    {selectedComps.map((comp) => (
+                      <li key={comp.id}>
+                        {comp.name} <span className="text-orange-600 font-semibold">+L{comp.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               );
             }
           }

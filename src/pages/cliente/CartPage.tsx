@@ -66,14 +66,39 @@ export default function CartPage({
     const timestamp_creacion = Date.now();
     const estimateTime = timestamp_creacion + 3 * 60 * 1000; // 3 minutos en ms
     // Construir items para el pedido
-    const items = cart.map((item, idx) => ({
-      id_orden_item: idx + 1, // temporal, se reemplazará al enviar al backend
-      id_producto: item.id,
-      nombre_producto: item.name,
-      cantidad: item.quantity,
-      precio_unitario: item.price,
-      notas: item.instructions || ""
-    }));
+    const items: Array<{
+      id_orden_item: number;
+      id_producto: number;
+      nombre_producto: string;
+      cantidad: number;
+      precio_unitario: number;
+      notas: string;
+    }> = [];
+    let idx = 1;
+    cart.forEach((item) => {
+      // Producto principal
+      items.push({
+        id_orden_item: idx++,
+        id_producto: item.id,
+        nombre_producto: item.name,
+        cantidad: item.quantity,
+        precio_unitario: item.price,
+        notas: item.instructions || ""
+      });
+      // Complementos seleccionados
+      if (item.complements && item.complements.length > 0) {
+        item.complements.filter(c => c.selected).forEach((comp) => {
+          items.push({
+            id_orden_item: idx++,
+            id_producto: comp.id,
+            nombre_producto: comp.name,
+            cantidad: 1,
+            precio_unitario: comp.price,
+            notas: ''
+          });
+        });
+      }
+    });
     // Concatenar todas las instrucciones especiales
     const notas = cart
       .map((item) => item.instructions?.trim())

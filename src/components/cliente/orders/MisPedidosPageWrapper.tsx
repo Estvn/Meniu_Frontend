@@ -102,6 +102,32 @@ export default function MisPedidosPageWrapper() {
     });
   }, [orders, mesaId]);
 
+  // Limpieza de localStorage al cerrar la app si todos los pedidos están pagados o cancelados
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (mesaId !== null) {
+        const key = `orders_mesa_${mesaId}`;
+        const localOrders = JSON.parse(localStorage.getItem(key) || "[]");
+        if (Array.isArray(localOrders) && localOrders.length > 0) {
+          const allPaidOrCancelled = localOrders.every(
+            (order: any) => order.estado === "PAGADA" || order.estado === "CANCELADA"
+          );
+          if (allPaidOrCancelled) {
+            localStorage.removeItem(key);
+            // También limpiar el carrito
+            const restauranteId = localStorage.getItem("id_restaurante");
+            if (restauranteId) {
+              const cartKey = `cart_${restauranteId}_${mesaId}`;
+              localStorage.removeItem(cartKey);
+            }
+          }
+        }
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [mesaId, orders]);
+
   // Cancelar una orden (solo local)
   const handleCancelOrder = (orderId: number | undefined) => {
     let updatedOrders;

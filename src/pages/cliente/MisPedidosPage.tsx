@@ -93,11 +93,11 @@ export default function MisPedidosPage({
               ? order.id_orden
               : (order.timestamp_creacion !== undefined ? order.timestamp_creacion : undefined);
             return (
-              <OrderCard
+            <OrderCard
                 key={order.id_orden ?? order.timestamp_creacion}
-                order={order}
+              order={order}
                 onCancelOrder={cancelId !== undefined ? () => handleCancelOrder(cancelId) : undefined}
-              />
+            />
             );
           })}
         </div>
