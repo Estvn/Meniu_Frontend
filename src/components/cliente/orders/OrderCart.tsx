@@ -14,7 +14,7 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
   // Calcular tiempo restante real para pedidos pendientes
   const totalSeconds = order.timestamp_creacion && order.estimateTime
     ? Math.floor((order.estimateTime - order.timestamp_creacion) / 1000)
-    : 0;
+  : 0;
   const createdDate = new Date(order.timestamp_creacion || Date.now());
   const timeLeft = useCountdown(createdDate, totalSeconds);
 
@@ -58,7 +58,12 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
 
   const handleConfirmCancel = () => {
     setShowConfirmModal(false);
-    onCancelOrder?.(order.id_orden !== null ? order.id_orden : order.timestamp_creacion);
+    const cancelId = order.id_orden !== null && order.id_orden !== undefined
+      ? order.id_orden
+      : (order.timestamp_creacion !== undefined ? order.timestamp_creacion : undefined);
+    if (typeof cancelId === 'number') {
+      onCancelOrder?.(cancelId);
+    }
   };
 
   const handleCloseModal = () => {
@@ -89,12 +94,6 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
 
       <p className="text-sm text-gray-600 mb-3">{getStatusMessage()}</p>
 
-      {order.notas && (
-        <div className="mb-2 p-2 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded">
-          <span className="font-semibold">Notas:</span> {order.notas}
-        </div>
-      )}
-
       <div className="space-y-2 mb-3">
         {order.items.map((item) => (
           <div key={item.id_orden_item} className="text-sm">
@@ -107,17 +106,21 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
                 L{(item.precio_unitario * item.cantidad).toFixed(2)}
               </span>
             </div>
-            {item.notas && (
-              <div className="text-gray-600 text-xs ml-4">{item.notas}</div>
-            )}
           </div>
         ))}
       </div>
+
 
       <div className="flex justify-between text-sm text-gray-600 mb-2">
         <span>ISV (15%)</span>
         <span>L{(Number(order.impuestos) || 0).toFixed(2)}</span>
       </div>
+
+      {order.notas && (
+        <div className="mb-2 p-2 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded">
+          <span className="font-semibold">Notas:</span> {order.notas}
+        </div>
+      )}
 
       {/* Pedido entregado */}
       {order.estado === "ENTREGADA" && (

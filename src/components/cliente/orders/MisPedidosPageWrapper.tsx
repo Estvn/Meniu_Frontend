@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import MisPedidosPage from "../../../pages/cliente/MisPedidosPage.tsx";
 import type { Order } from "../shared/order-types.ts";
-import type { CartItem } from "../shared/restaurant-types.ts";
+//import type { CartItem } from "../shared/restaurant-types.ts";
 import { fetchOrderDetails } from "../fetch/orders.ts";
 import { createOrder } from "../fetch/orders.ts";
+import { useCart } from "../hooks/useCart";
 
 export default function MisPedidosPageWrapper() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [totalCartItems, setTotalCartItems] = useState(0);
   const [mesaId, setMesaId] = useState<number | null>(null);
+  const { totalItems } = useCart();
 
   // Función para cargar y actualizar las órdenes desde el backend y localStorage
   const loadOrders = async (ids: number[], localOrders: any[] = []) => {
@@ -42,7 +43,7 @@ export default function MisPedidosPageWrapper() {
   // Cargar ids y datos iniciales
   useEffect(() => {
     const storedMesaId = localStorage.getItem("id_mesa");
-    const storedCart = localStorage.getItem("cart");
+    //const storedCart = localStorage.getItem("cart");
 
     if (storedMesaId) {
       const id = Number(storedMesaId);
@@ -59,15 +60,6 @@ export default function MisPedidosPageWrapper() {
       } else {
         setOrders([]);
       }
-    }
-
-    if (storedCart) {
-      const cartItems = JSON.parse(storedCart);
-      const totalItems = (cartItems as CartItem[]).reduce(
-  (sum, item) => sum + item.quantity,
-  0
-);
-      setTotalCartItems(totalItems);
     }
   }, []);
 
@@ -144,7 +136,7 @@ export default function MisPedidosPageWrapper() {
       onCancelOrder={handleCancelOrder}
       totalActiveAmount={totalActiveAmount}
       activeOrdersCount={activeOrdersCount}
-      totalCartItems={totalCartItems}
+      totalCartItems={totalItems}
     />
   );
 }

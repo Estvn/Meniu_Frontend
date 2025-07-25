@@ -35,7 +35,7 @@ export default function ProductDetailPage({
           id: c.id,
           name: c.nombre || c.name || "Complemento",
           price: Number(c.precio ?? c.price ?? 0),
-          selected: false,
+      selected: false,
         })) : [];
         setComplements(comps);
       })
@@ -127,41 +127,41 @@ export default function ProductDetailPage({
 
         {/* Complements section */}
         {!loadingComplements && complements.length > 0 && (
-          <div className="mx-4 mt-8">
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">
-                Complementos
-              </h2>
-              <div className="space-y-4">
-                {complements.map((complement) => (
-                  <div
-                    key={complement.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-semibold text-gray-900">
-                        {complement.name}
-                      </div>
-                      <div className="text-gray-600">
-                        +L{complement.price.toFixed(2)}
-                      </div>
+        <div className="mx-4 mt-8">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              Complementos
+            </h2>
+            <div className="space-y-4">
+              {complements.map((complement) => (
+                <div
+                  key={complement.id}
+                  className="flex items-center justify-between"
+                >
+                  <div>
+                    <div className="font-semibold text-gray-900">
+                      {complement.name}
                     </div>
-                    <button
-                      onClick={() => toggleComplement(complement.id)}
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${complement.selected
-                          ? "border-orange-500 bg-orange-500"
-                          : "border-orange-500 bg-white"
-                        }`}
-                    >
-                      {complement.selected && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      )}
-                    </button>
+                    <div className="text-gray-600">
+                      +L{complement.price.toFixed(2)}
+                    </div>
                   </div>
-                ))}
-              </div>
+                  <button
+                    onClick={() => toggleComplement(complement.id)}
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${complement.selected
+                        ? "border-orange-500 bg-orange-500"
+                        : "border-orange-500 bg-white"
+                      }`}
+                  >
+                    {complement.selected && (
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    )}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
+        </div>
         )}
 
         {/* Special instructions */}

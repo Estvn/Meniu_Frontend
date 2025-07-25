@@ -58,6 +58,11 @@ export default function MisPedidosPage({
     toast.error("Pedido cancelado", {
       description: "El pedido ha sido cancelado exitosamente",
       duration: 3000,
+      style: {
+        backgroundColor: "#ef4444",
+        color: "white",
+        fontWeight: "500",
+      },
     });
   };
 
@@ -83,13 +88,18 @@ export default function MisPedidosPage({
 
         {/* Lista de pedidos */}
         <div className="space-y-4">
-          {orders.map((order) => (
-            <OrderCard
-              key={order.id_orden ?? order.timestamp_creacion}
-              order={order}
-              onCancelOrder={() => handleCancelOrder(order.id_orden !== null ? order.id_orden : order.timestamp_creacion)}
-            />
-          ))}
+          {orders.map((order) => {
+            const cancelId = order.id_orden !== null && order.id_orden !== undefined
+              ? order.id_orden
+              : (order.timestamp_creacion !== undefined ? order.timestamp_creacion : undefined);
+            return (
+              <OrderCard
+                key={order.id_orden ?? order.timestamp_creacion}
+                order={order}
+                onCancelOrder={cancelId !== undefined ? () => handleCancelOrder(cancelId) : undefined}
+              />
+            );
+          })}
         </div>
 
         {/* Sin pedidos */}

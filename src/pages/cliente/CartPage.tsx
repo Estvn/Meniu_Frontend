@@ -53,7 +53,13 @@ export default function CartPage({
   const handleConfirmOrder = async () => {
     // Validar IDs
     if (!Number.isFinite(mesaId) || !Number.isFinite(restauranteId) || mesaId <= 0 || restauranteId <= 0) {
-      toast.error("Error: Restaurante o mesa no válidos. No se puede crear la orden.");
+      toast.error("Error: Restaurante o mesa no válidos. No se puede crear la orden.", {
+        style: {
+          backgroundColor: "#ef4444",
+          color: "white",
+          fontWeight: "500",
+        },
+      });
       return;
     }
     // Crear pedido pendiente local
