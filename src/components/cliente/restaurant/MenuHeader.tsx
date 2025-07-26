@@ -3,7 +3,7 @@
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {useState} from "react";
-import Logo from "../../../../public/img/logoHorizontal.png";
+import Logo from "../../../../src/assets/img/logoHorizontal.png";
 import {RequestBillModal} from "../orders/SolicitarPago.tsx";
 
 

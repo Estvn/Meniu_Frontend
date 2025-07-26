@@ -59,7 +59,7 @@ export default function ClienteMenu() {
   };
 
   fetchData();
-}, [restauranteId, numeroMesa]);
+}, [restauranteId, numeroMesa, searchParams]);
 
   const {
     activeCategory,

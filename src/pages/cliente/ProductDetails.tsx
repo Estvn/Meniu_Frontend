@@ -31,7 +31,13 @@ export default function ProductDetailPage({
     setLoadingComplements(true);
     fetchComplementos(item.id)
       .then((data) => {
-        const comps = Array.isArray(data.complementos) ? data.complementos.map((c: any) => ({
+        const comps = Array.isArray(data.complementos) ? data.complementos.map((c: {
+          id: number;
+          nombre?: string;
+          name?: string;
+          precio?: number;
+          price?: number;
+        }) => ({
           id: c.id,
           name: c.nombre || c.name || "Complemento",
           price: Number(c.precio ?? c.price ?? 0),

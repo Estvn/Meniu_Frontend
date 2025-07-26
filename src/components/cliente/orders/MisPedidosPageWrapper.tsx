@@ -6,26 +6,78 @@ import { fetchOrderDetails } from "../fetch/orders.ts";
 import { createOrder } from "../fetch/orders.ts";
 import { useCart } from "../hooks/useCart";
 
+// Tipos para los datos del localStorage
+interface LocalOrderItem {
+  id_orden_item: number;
+  id_producto: number;
+  nombre_producto: string;
+  cantidad: number;
+  precio_unitario: number;
+  notas: string;
+}
+
+interface LocalOrder {
+  id_orden: number | null;
+  estado: string;
+  fecha: string;
+  hora_confirmacion: string;
+  subtotal: number;
+  impuestos: number;
+  total: number;
+  solicitud_pago: boolean;
+  notas: string;
+  restaurante: { id_restaurante: number; nombre: string };
+  mesa: { id_mesa: number; numero_mesa: number };
+  items: LocalOrderItem[];
+  timestamp_creacion?: number;
+  estimateTime?: number;
+}
+
+interface BackendOrderItem {
+  id_orden_item: number;
+  id_producto: number;
+  nombre_producto?: string;
+  producto?: { nombre: string; precio: number };
+  cantidad: number;
+  precio_unitario?: number;
+  notas: string;
+}
+
+interface BackendOrder {
+  id_orden: number;
+  estado: string;
+  fecha: string;
+  hora_confirmacion: string;
+  subtotal: string | number;
+  impuestos: string | number;
+  total: string | number;
+  solicitud_pago: boolean;
+  notas: string;
+  restaurante: { id_restaurante: number; nombre: string };
+  mesa: { id_mesa: number; numero_mesa: number };
+  items: BackendOrderItem[];
+}
+
 export default function MisPedidosPageWrapper() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [mesaId, setMesaId] = useState<number | null>(null);
   const { totalItems } = useCart();
 
   // Función para cargar y actualizar las órdenes desde el backend y localStorage
-  const loadOrders = async (ids: number[], localOrders: any[] = []) => {
+  const loadOrders = async (ids: number[], localOrders: LocalOrder[] = []) => {
     try {
       const detalles = await Promise.all(
         ids.map((id) => fetchOrderDetails(id).catch(() => null))
       );
       // Filtrar las que no fallaron
-      const validOrders = detalles.filter(Boolean).map((order: any) => ({
+      const validOrders = detalles.filter(Boolean).map((order: BackendOrder) => ({
         ...order,
         estado: order.estado as import("../shared/order-types").OrderStatus,
         impuestos: Number(order.impuestos) || 0,
         subtotal: Number(order.subtotal) || 0,
         total: Number(order.total) || 0,
         mesa: order.mesa || { numero_mesa: "?" },
-        items: (order.items || []).map((item: any) => ({
+        items: (order.items || []).map((item: BackendOrderItem) => ({
           ...item,
           nombre_producto: item.nombre_producto || item.producto?.nombre || "Producto sin nombre",
           precio_unitario: Number(item.precio_unitario) || Number(item.producto?.precio) || 0,
@@ -51,8 +103,8 @@ export default function MisPedidosPageWrapper() {
       const orderObjs = JSON.parse(localStorage.getItem(`orders_mesa_${id}`) || "[]");
       if (Array.isArray(orderObjs) && orderObjs.length > 0) {
         // ids de pedidos ya enviados
-        const getCurrentOrders = () => JSON.parse(localStorage.getItem(`orders_mesa_${id}`) || "[]");
-        const getCurrentIds = () => getCurrentOrders().filter((o: any) => o.id_orden).map((o: any) => o.id_orden);
+        const getCurrentOrders = (): LocalOrder[] => JSON.parse(localStorage.getItem(`orders_mesa_${id}`) || "[]");
+        const getCurrentIds = (): number[] => getCurrentOrders().filter((o: LocalOrder) => o.id_orden).map((o: LocalOrder) => o.id_orden!);
         loadOrders(getCurrentIds(), getCurrentOrders());
         // Polling cada 10 segundos
         const interval = setInterval(() => loadOrders(getCurrentIds(), getCurrentOrders()), 10000);
@@ -67,14 +119,16 @@ export default function MisPedidosPageWrapper() {
   useEffect(() => {
     if (!mesaId) return;
     const key = `orders_mesa_${mesaId}`;
-    const localOrders = JSON.parse(localStorage.getItem(key) || "[]");
+    const localOrders: LocalOrder[] = JSON.parse(localStorage.getItem(key) || "[]");
     const now = Date.now();
-    localOrders.forEach(async (order: any, idx: number) => {
-      if (!order.id_orden && order.estado === "PENDIENTE" && order.estimateTime <= now) {
+    localOrders.forEach(async (order: LocalOrder, idx: number) => {
+      if (!order.id_orden && order.estado === "PENDIENTE" && order.estimateTime && order.estimateTime <= now) {
         // Preparar cart para createOrder
-        const cart = order.items.map((item: any) => ({
+        const cart = order.items.map((item: LocalOrderItem) => ({
           id: item.id_producto,
+          uid: `item-${item.id_producto}-${Date.now()}`, // Generar uid único
           name: item.nombre_producto,
+          description: item.nombre_producto, // Usar nombre como descripción
           price: item.precio_unitario,
           quantity: item.cantidad,
         }));
@@ -107,10 +161,10 @@ export default function MisPedidosPageWrapper() {
     const handleBeforeUnload = () => {
       if (mesaId !== null) {
         const key = `orders_mesa_${mesaId}`;
-        const localOrders = JSON.parse(localStorage.getItem(key) || "[]");
+        const localOrders: LocalOrder[] = JSON.parse(localStorage.getItem(key) || "[]");
         if (Array.isArray(localOrders) && localOrders.length > 0) {
           const allPaidOrCancelled = localOrders.every(
-            (order: any) => order.estado === "PAGADA" || order.estado === "CANCELADA"
+            (order: LocalOrder) => order.estado === "PAGADA" || order.estado === "CANCELADA"
           );
           if (allPaidOrCancelled) {
             localStorage.removeItem(key);

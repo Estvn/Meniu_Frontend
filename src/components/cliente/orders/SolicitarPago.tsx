@@ -2,6 +2,55 @@ import { X, CreditCard, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { solicitarPago, fetchOrderDetails } from "../fetch/orders.ts";
 
+// Tipos para las órdenes del localStorage
+interface LocalOrder {
+  id_orden: number | null;
+  id?: number;
+  estado: string;
+  fecha: string;
+  hora_confirmacion: string;
+  subtotal: number;
+  impuestos: number;
+  total: number;
+  solicitud_pago: boolean;
+  notas: string;
+  restaurante: { id_restaurante: number; nombre: string };
+  mesa: { id_mesa: number; numero_mesa: number };
+  items: Array<{
+    id_orden_item: number;
+    id_producto: number;
+    nombre_producto: string;
+    cantidad: number;
+    precio_unitario: number;
+    notas: string;
+  }>;
+  timestamp_creacion?: number;
+  estimateTime?: number;
+}
+
+// Tipo para las órdenes del backend
+interface BackendOrder {
+  id_orden: number;
+  estado: string;
+  fecha: string;
+  hora_confirmacion: string;
+  subtotal: number;
+  impuestos: number;
+  total: number;
+  solicitud_pago: boolean;
+  notas: string;
+  restaurante: { id_restaurante: number; nombre: string };
+  mesa: { id_mesa: number; numero_mesa: number };
+  items: Array<{
+    id_orden_item: number;
+    id_producto: number;
+    nombre_producto: string;
+    cantidad: number;
+    precio_unitario: number;
+    notas: string;
+  }>;
+}
+
 interface RequestBillModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -45,24 +94,24 @@ export function RequestBillModal({
 
     // Obtener los ids de las órdenes de la mesa
     const mesaId = localStorage.getItem("id_mesa");
-    let orderIds = [];
+    let orderIds: number[] = [];
     if (mesaId) {
-      const allOrders = JSON.parse(localStorage.getItem(`orders_mesa_${mesaId}`) || "[]");
-      orderIds = allOrders.map((o: any) => o.id_orden || o.id);
+      const allOrders: LocalOrder[] = JSON.parse(localStorage.getItem(`orders_mesa_${mesaId}`) || "[]");
+      orderIds = allOrders.map((o: LocalOrder) => o.id_orden || o.id || 0).filter(id => id !== 0);
     }
 
     console.log("IDs de las órdenes a consultar:", orderIds);
 
     // Consultar el backend para obtener el estado real de cada pedido
     const detalles = await Promise.all(orderIds.map((id: number) => fetchOrderDetails(id).catch(() => null)));
-    detalles.forEach((order: any) => {
+    detalles.forEach((order: BackendOrder | null) => {
       if (order) {
         console.log(`Orden ID: ${order.id_orden}, Estado: ${order.estado}`);
       }
     });
     const entregadas = detalles.filter(
-      (order: any) => order && order.estado === "ENTREGADA"
-    );
+      (order: BackendOrder | null) => order && order.estado === "ENTREGADA"
+    ) as BackendOrder[];
 
     if (entregadas.length === 0) {
       toast.error("No hay pedidos entregados para solicitar pago");
@@ -71,7 +120,7 @@ export function RequestBillModal({
     }
 
     try {
-      await Promise.all(entregadas.map((order: any) => solicitarPago(order.id_orden)));
+      await Promise.all(entregadas.map((order: BackendOrder) => solicitarPago(order.id_orden)));
       toast.success("¡Solicitud de pago enviada!", {
       description: "El mesero se dirigirá a tu mesa para procesar el pago",
       duration: 4000,
@@ -82,6 +131,7 @@ export function RequestBillModal({
       },
     });
     } catch (error) {
+      console.error("Error al solicitar el pago:", error);
       toast.error("Error al solicitar el pago");
     }
     onClose();
