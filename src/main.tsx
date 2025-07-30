@@ -8,6 +8,8 @@ import Login from './components/Login.tsx'
 import MenuGerente from './components/administration/restaurant_food/MenuGerente.tsx';
 import MesasGerente from './components/administration/restaurant_tables/MesasGerente.tsx';
 import PersonalGerente from './components/administration/restaurant_staff/PersonalGerente.tsx';
+import { CashierDashboard } from './components/cashier/CashierDashboard.tsx';
+import { CookDashboard } from './components/cooks/CookDashboard.tsx';
 import { isAuthenticated } from './assets/scripts/values/constValues';
 
 const queryClient = new QueryClient();
@@ -30,7 +32,9 @@ createRoot(document.getElementById('root')!).render(
         <Route path = "/menu" element = {<ProtectedRoute><MenuGerente/></ProtectedRoute>}></Route>
         <Route path = "/mesas" element = {<ProtectedRoute><MesasGerente/></ProtectedRoute>}></Route>
         <Route path = "/personal" element = {<ProtectedRoute><PersonalGerente/></ProtectedRoute>}></Route>
-      </Routes>
+        <Route path = "/cajero" element = {<ProtectedRoute><CashierDashboard/></ProtectedRoute>}></Route>
+        <Route path = "/cocinero" element = {<ProtectedRoute><CookDashboard/></ProtectedRoute>}></Route>
+              </Routes>
     </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,
