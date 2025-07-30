@@ -2,12 +2,14 @@
 
 
 interface SearchSectionProps {
+  onSearch?: (searchTerm: string) => void;
   onCategoryFilterChange?: (categoryId: string | null) => void;
   activeCategoryFilter?: string | null;
   categories?: Array<{ id_categoria: number; nombre: string }>;
 }
 
 export function SearchSection({ 
+  onSearch,
   onCategoryFilterChange, 
   activeCategoryFilter = null,
   categories = []
@@ -35,6 +37,7 @@ export function SearchSection({
           <input
             type="text"
             placeholder="Buscar plato..."
+            onChange={(e) => onSearch?.(e.target.value)}
             className="block w-full pl-10 pr-3 py-3 sm:py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base text-gray-900 placeholder-gray-500"
           />
         </div>

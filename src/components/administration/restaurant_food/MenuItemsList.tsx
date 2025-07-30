@@ -10,15 +10,16 @@ interface MenuItemsListProps {
   refreshTrigger?: number;
   activeFilter?: 'all' | 'available' | 'unavailable';
   activeCategoryFilter?: string | null;
+  searchTerm?: string;
   productos?: Producto[];
 }
 
-export function MenuItemsList({ onEditFood, onToggleStatus, refreshTrigger, activeFilter = 'all', activeCategoryFilter = null, productos: productosProp = [] }: MenuItemsListProps) {
+export function MenuItemsList({ onEditFood, onToggleStatus, refreshTrigger, activeFilter = 'all', activeCategoryFilter = null, searchTerm = '', productos: productosProp = [] }: MenuItemsListProps) {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filtrar productos según el filtro activo y categoría
+  // Filtrar productos según el filtro activo, categoría y búsqueda
   const productosFiltrados = productos.filter(producto => {
     // Primero filtrar por estado (disponible/no disponible)
     let pasaFiltroEstado = true;
@@ -39,7 +40,17 @@ export function MenuItemsList({ onEditFood, onToggleStatus, refreshTrigger, acti
       pasaFiltroCategoria = producto.subcategoria.categoria.id_categoria.toString() === activeCategoryFilter;
     }
 
-    return pasaFiltroEstado && pasaFiltroCategoria;
+    // Finalmente filtrar por término de búsqueda
+    let pasaFiltroBusqueda = true;
+    if (searchTerm.trim()) {
+      const termino = searchTerm.toLowerCase();
+      pasaFiltroBusqueda = producto.nombre.toLowerCase().includes(termino) ||
+                           producto.descripcion.toLowerCase().includes(termino) ||
+                           producto.subcategoria.nombre.toLowerCase().includes(termino) ||
+                           producto.subcategoria.categoria.nombre.toLowerCase().includes(termino);
+    }
+
+    return pasaFiltroEstado && pasaFiltroCategoria && pasaFiltroBusqueda;
   });
 
   // Usar productos pasados como prop si están disponibles, sino cargarlos

@@ -8,6 +8,8 @@ import { useFormPersistence } from "../../../hooks/useFormPersistence";
 import { usePlanes } from '../../../endpoints/administration/planes';
 import { useRegistroCliente } from '../../../endpoints/administration/registro';
 import { Modal } from '../forms/Modal';
+import { FileUploadField } from '../forms/FileUploadField';
+import { uploadImageToDrive } from '../../../assets/scripts/googleDrive/uploadImage';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -69,6 +71,7 @@ interface FormValues {
     address: string;
     phone: string;
     restaurantEmail?: string;
+    restaurantLogo?: File | null;
     subscriptionPlan: string;
     ownerName: string;
     cardNumber: string;
@@ -128,50 +131,100 @@ export default function FormRegistry() {
     const [showUserModal, setShowUserModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [generatedUsername, setGeneratedUsername] = useState('');
+    const [restaurantLogo, setRestaurantLogo] = useState<File | null>(null);
+    const [logoUploading, setLogoUploading] = useState(false);
     const navigate = useNavigate();
 
-    const onSubmit: SubmitHandler<FormValues> = (data) => {
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
         // Solo registrar en el paso final (contraseña)
         if (step !== 4) {
             return;
         }
 
-        // Mapear los datos del formulario a los campos del endpoint
-        const payload = {
-            cvv: data.cvv,
-            mes_expiracion: data.expMonth,
-            nombre_propietario_tarjeta: data.ownerName,
-            email_restaurante: data.restaurantEmail,
-            nombre: data.firstName,
-            numero_tarjeta: data.cardNumber,
-            anio_expiracion: data.expYear,
-            descripcion: 'Restaurante de comida tradicional', // Valor fijo o puedes mapearlo de un campo
-            id_plan: data.subscriptionPlan,
-            direccion: data.address,
-            nombre_restaurante: data.restaurantName,
-            telefono: data.phone,
-            apellidos: data.lastName,
-            password: data.password,
-            email: data.email,
-        };
-        mutate(payload, {
-            onSuccess: (response) => {
-                if (response.success) {
-                    // Generar nombre de usuario basado en el email
-                    const email = data.email;
-                    const username = email.split('@')[0];
-                    setGeneratedUsername(username);
-                    setShowUserModal(true);
-                } else {
-                    setErrorMessage(response.message || 'Hubo un problema con el registro.');
+        try {
+            let logoUrl: string | undefined;
+
+            // Subir logo si existe
+            if (restaurantLogo) {
+                try {
+                    console.log('Iniciando subida de logo a Google Drive...');
+                    logoUrl = await uploadLogoToDrive(restaurantLogo);
+                    console.log('Logo subido exitosamente:', logoUrl);
+                } catch (error) {
+                    console.error('Error al subir logo:', error);
+                    setErrorMessage('Error al subir el logo del restaurante. Por favor, inténtalo de nuevo.');
+                    setShowErrorModal(true);
+                    return;
+                }
+            }
+
+            // Mapear los datos del formulario a los campos del endpoint
+            const payload = {
+                cvv: data.cvv,
+                mes_expiracion: data.expMonth,
+                nombre_propietario_tarjeta: data.ownerName,
+                email_restaurante: data.restaurantEmail || undefined,
+                nombre: data.firstName,
+                numero_tarjeta: data.cardNumber,
+                anio_expiracion: data.expYear,
+                descripcion: 'Restaurante de comida tradicional',
+                id_plan: data.subscriptionPlan,
+                direccion: data.address,
+                nombre_restaurante: data.restaurantName,
+                telefono: data.phone,
+                apellidos: data.lastName,
+                password: data.password,
+                email: data.email,
+                logoUrl: logoUrl,
+            };
+
+            console.log('Enviando payload al backend:', payload);
+
+            mutate(payload, {
+                onSuccess: (response) => {
+                    console.log('Respuesta exitosa del backend:', response);
+                    if (response.success) {
+                        // Generar nombre de usuario basado en el email
+                        const email = data.email;
+                        const username = email.split('@')[0];
+                        setGeneratedUsername(username);
+                        setShowUserModal(true);
+                    } else {
+                        setErrorMessage(response.message || 'Hubo un problema con el registro.');
+                        setShowErrorModal(true);
+                    }
+                },
+                onError: (error) => {
+                    console.error('Error en la mutación:', error);
+                    setErrorMessage(error.message || 'Hubo un problema con el registro.');
                     setShowErrorModal(true);
                 }
-            },
-            onError: (error) => {
-                setErrorMessage(error.message || 'Hubo un problema con el registro.');
-                setShowErrorModal(true);
-            }
-        });
+            });
+        } catch (error) {
+            console.error('Error en el registro:', error);
+            setErrorMessage('Error inesperado durante el registro. Por favor, inténtalo de nuevo.');
+            setShowErrorModal(true);
+        }
+    };
+
+    const handleLogoChange = (file: File | null) => {
+        setRestaurantLogo(file);
+        // Actualizar el valor en el formulario
+        methods.setValue('restaurantLogo', file);
+    };
+
+    const uploadLogoToDrive = async (file: File): Promise<string> => {
+        setLogoUploading(true);
+        try {
+            const fileName = `restaurant_logo_${Date.now()}_${file.name}`;
+            const imageUrl = await uploadImageToDrive(file, fileName);
+            return imageUrl;
+        } catch (error) {
+            console.error('Error al subir logo:', error);
+            throw new Error('Error al subir el logo del restaurante');
+        } finally {
+            setLogoUploading(false);
+        }
     };
 
     const handleUserModalConfirm = () => {
@@ -268,6 +321,21 @@ export default function FormRegistry() {
                         label="Correo electrónico (opcional)"
                         type="email"
                         />
+                        <div>
+                            <FileUploadField
+                                label="Logo del Restaurante (opcional)"
+                                placeholder="Arrastra o haz clic para subir el logo del restaurante"
+                                onChange={handleLogoChange}
+                                accept="image/*"
+                                selectedFile={restaurantLogo}
+                            />
+                            {logoUploading && (
+                                <div className="flex items-center gap-2 text-sm text-orange-600 mt-1">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                                    Subiendo logo...
+                                </div>
+                            )}
+                        </div>
                     </div>
                     )}
 
@@ -394,7 +462,7 @@ export default function FormRegistry() {
                     </div>
                     )}
 
-                    <div className="mt-6 flex justify-center sm:justify-end w-full max-w-sm mx-auto">
+                    <div className="mt-6 flex justify-center w-full max-w-sm mx-auto">
                         <ButtonNext
                             text={step < steps.length - 1 ? "Siguiente" : "Registrarse"}
                             onClick={handleNext}
