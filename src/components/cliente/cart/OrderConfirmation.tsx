@@ -66,10 +66,10 @@ export function OrderConfirmationModal({
               <div key={item.uid} className="space-y-1">
                 {/* Producto principal */}
                 <div className="flex justify-between text-sm">
-                  <span>
-                    {item.quantity}x {item.name}
-                  </span>
-                  <span>L{(item.price * item.quantity).toFixed(2)}</span>
+                <span>
+                  {item.quantity}x {item.name}
+                </span>
+                <span>L{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
                 
                 {/* Complementos seleccionados */}

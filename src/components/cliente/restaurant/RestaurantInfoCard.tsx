@@ -3,29 +3,61 @@
 import { Phone, MapPin } from "lucide-react";
 import type { Restaurante } from "../shared/restaurant-types.ts";
 
+// Función para obtener la URL de imagen pública de Google Drive con proxy CORS
+const getImageUrl = (imageRef: string) => {
+  if (!imageRef) return "";
+  
+  // Si es una URL completa de Google Drive, extraer el id
+  if (imageRef.includes('drive.usercontent.google.com') || imageRef.includes('drive.google.com')) {
+    const match = imageRef.match(/[?&]id=([^&]+)/);
+    if (match) {
+      const driveId = match[1];
+      return `https://corsproxy.io/?${encodeURIComponent(`https://drive.usercontent.google.com/download?id=${driveId}&authuser=0`)}`;
+    }
+  }
+  
+  // Si es una URL directa, usarla con proxy
+  if (imageRef.startsWith("http")) {
+    return `https://corsproxy.io/?${encodeURIComponent(imageRef)}`;
+  }
+  
+  // Si es una ruta relativa del backend
+  if (imageRef.startsWith("/")) {
+    return import.meta.env.VITE_API_URL + imageRef;
+  }
+  
+  return "";
+};
+
 interface Props {
   restaurant: Restaurante;
 }
 
 export function RestaurantInfo({ restaurant }: Props) {
+  const imageUrl = getImageUrl(restaurant.logo_url || "");
+  
   return (
     <>
       {/* Imagen del restaurante */}
-<div className="h-48 bg-gray-300 relative overflow-hidden">
-  {restaurant.logo_url ? (
-    <img
-      src={import.meta.env.VITE_API_URL + restaurant.logo_url}
-      alt={restaurant.nombre}
-      className="w-full h-full object-cover"
-    />
-  ) : (
-    <div className="absolute inset-0 bg-gray-400 flex items-center justify-center">
-      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gray-400 rounded"></div>
+      <div className="h-48 bg-gray-300 relative overflow-hidden">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={restaurant.nombre}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              console.warn(`Error al cargar logo del restaurante ${restaurant.nombre}:`, e);
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+        ) : null}
+        <div className={`absolute inset-0 bg-gray-400 flex items-center justify-center ${imageUrl ? 'hidden' : ''}`}>
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-gray-400 rounded"></div>
+          </div>
+        </div>
       </div>
-    </div>
-  )}
-</div>
 
 
       {/* CArd con informacion */}

@@ -20,8 +20,8 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.60.0",
     "react-router-dom": "^7.6.2",
-    "sonner": "^2.0.6",
     "socket.io-client": "^4.8.1",
+    "sonner": "^2.0.6",
     "tailwindcss": "^4.1.10",
     "uuid": "^11.1.0",
     "vite-plugin-pwa": "^1.0.0"

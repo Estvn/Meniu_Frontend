@@ -1,5 +1,3 @@
-// components/cliente/fetch/restaurants.ts
-
 const API_URL = import.meta.env.VITE_API_URL;
 
 export interface Restaurante {
@@ -7,7 +5,8 @@ export interface Restaurante {
   nombre: string;
   direccion?: string;
   telefono?: string;
-  logo?: string;
+  logo_url?: string;
+  descripcion?: string;
 }
 
 export async function getRestaurantById(restauranteId: number): Promise<Restaurante> {
