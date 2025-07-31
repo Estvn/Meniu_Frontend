@@ -28,8 +28,8 @@ function LoginContent() {
         localStorage.removeItem('login-form-data');
       } else {
         localStorage.removeItem('registry-form-data');
-      }
-      prevTabRef.current = activeTab;
+              }
+        prevTabRef.current = activeTab;
     }
   }, [activeTab, resetStep]);
 

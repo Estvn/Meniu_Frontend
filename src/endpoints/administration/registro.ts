@@ -20,6 +20,7 @@ export interface RegistroClienteRequest {
   apellidos: string;
   password: string;
   email: string;
+  logoUrl?: string;
 }
 
 export interface RegistroClienteResponse {
@@ -32,20 +33,24 @@ export interface RegistroClienteResponse {
 }
 
 const postRegistroCliente = async (data: RegistroClienteRequest): Promise<RegistroClienteResponse> => {
-  const formData = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      formData.append(key, value);
-    }
-  });
+  // Filtrar campos undefined/null
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined && value !== null)
+  );
 
-  const response = await fetch(`http://${BASE_URL}/registro-clientes/registro`, {
+  const response = await fetch(`http://${BASE_URL}/registro-clientes/registro-text`, {
     method: 'POST',
-    body: formData,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(cleanData),
   });
+  
   if (!response.ok) {
-    throw new Error('Error al registrar el cliente');
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Error al registrar el cliente: ${response.status}`);
   }
+  
   return response.json();
 };
 

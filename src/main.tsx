@@ -12,6 +12,8 @@ import PersonalGerente from './components/administration/restaurant_staff/Person
 import ClienteMenu from './pages/cliente/ClienteMenu.tsx';
 import CartPageWrapper from './components/cliente/cart/CartPageWrapper.tsx';
 import MisPedidosPageWrapper from './components/cliente/orders/MisPedidosPageWrapper.tsx';
+import { CashierDashboard } from './components/cashier/CashierDashboard.tsx';
+import { CookDashboard } from './components/cooks/CookDashboard.tsx';
 import { isAuthenticated } from './assets/scripts/values/constValues';
 
 const queryClient = new QueryClient();
@@ -37,7 +39,9 @@ createRoot(document.getElementById('root')!).render(
         <Route path = "/cliente" element = {<ClienteMenu/>}></Route>
         <Route path = "/carrito" element = {<CartPageWrapper/>}></Route>
         <Route path = "/mis-pedidos" element = {<MisPedidosPageWrapper/>}></Route>
-      </Routes>
+        <Route path = "/cajero" element = {<ProtectedRoute><CashierDashboard/></ProtectedRoute>}></Route>
+        <Route path = "/cocinero" element = {<ProtectedRoute><CookDashboard/></ProtectedRoute>}></Route>
+              </Routes>
 
       
       <Toaster position="top-center"/>

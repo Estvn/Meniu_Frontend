@@ -27,6 +27,7 @@ export function MenuGerente() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [activeFilter, setActiveFilter] = useState<'all' | 'available' | 'unavailable'>('all');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState<Array<{ id_categoria: number; nombre: string }>>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
 
@@ -38,6 +39,10 @@ export function MenuGerente() {
 
   const handleCategoryFilterChange = (categoryId: string | null) => {
     setActiveCategoryFilter(categoryId);
+  };
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
   };
 
   // Cargar categorías al montar el componente
@@ -144,6 +149,7 @@ export function MenuGerente() {
       <HeaderNavBar title="Menú" subtitle="Gestión de Menú" />
       <div className="flex-1 flex flex-col pt-16 sm:pt-18 md:pt-20">
         <SearchSection 
+          onSearch={handleSearch}
           onCategoryFilterChange={handleCategoryFilterChange}
           activeCategoryFilter={activeCategoryFilter}
           categories={categories}
@@ -160,6 +166,7 @@ export function MenuGerente() {
           refreshTrigger={refreshTrigger}
           activeFilter={activeFilter}
           activeCategoryFilter={activeCategoryFilter}
+          searchTerm={searchTerm}
           productos={productos}
         />
       </div>

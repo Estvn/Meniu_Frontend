@@ -38,23 +38,23 @@ export function FileUploadField({
   };
 
   return (
-    <div className="flex relative flex-col gap-1.5 items-start self-stretch">
-      <label className="flex relative flex-col items-start self-stretch">
-        <span className="relative self-stretch text-xs leading-5 text-gray-700 max-sm:text-xs">
+    <div>
+      {label && (
+        <label className="block mb-1 text-left text-sm font-medium text-zinc-700">
           {label}
-        </span>
-      </label>
+        </label>
+      )}
       <div
-        className={`flex relative flex-col items-start self-stretch px-2.5 pt-2.5 pb-2.5 bg-white rounded-md border-gray-300 border-solid border-[0.839px] cursor-pointer hover:bg-gray-50 transition-colors ${selectedFile ? 'border-green-500 bg-green-50' : ''}`}
+        className={`w-full h-10 px-3 py-2 bg-white border border-zinc-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${selectedFile ? 'border-green-500 bg-green-50' : ''}`}
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <div className="flex relative flex-col items-start self-stretch w-full">
+        <div className="flex items-center justify-start w-full h-full">
           {selectedFile ? (
             <div className="flex items-center gap-2 w-full">
-              <div className="flex-1">
-                <span className="text-xs font-medium text-green-700">
+              <div className="flex-1 text-left">
+                <span className="text-sm font-medium text-green-700">
                   ✓ {selectedFile.name}
                 </span>
                 <span className="block text-xs text-gray-500">
@@ -67,13 +67,13 @@ export function FileUploadField({
                   e.stopPropagation();
                   onChange(null);
                 }}
-                className="text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded"
+                className="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded"
               >
                 ✕
               </button>
             </div>
           ) : (
-            <span className="relative self-stretch text-xs text-neutral-500 max-sm:text-xs">
+            <span className="text-sm text-gray-500 text-left">
               {placeholder}
             </span>
           )}

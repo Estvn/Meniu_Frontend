@@ -8,6 +8,7 @@ import { useLogin } from '../../../endpoints/administration/login';
 import { Modal } from '../forms/Modal';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { decodeJWT } from '../../../assets/scripts/values/constValues';
 
 interface FormValues {
     userOrEmail: string;
@@ -58,6 +59,7 @@ export default function FormLogin() {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
@@ -78,10 +80,38 @@ export default function FormLogin() {
                     // Solo guardar el token, los datos del usuario se extraen del JWT
                     sessionStorage.setItem('access_token', response.access_token);
                     
+                    // Decodificar el JWT para obtener el rol del usuario
+                    const decodedToken = decodeJWT(response.access_token);
+                    let redirectPath = '/menu'; // Por defecto va al menú del gerente
+                    let roleMessage = 'Será redirigido al menú principal...';
+                    
+                    if (decodedToken && decodedToken.rol) {
+                        switch (decodedToken.rol.toLowerCase()) {
+                            case 'cocinero':
+                                redirectPath = '/cocinero';
+                                roleMessage = 'Será redirigido al panel de cocinero...';
+                                break;
+                            case 'cajero':
+                                redirectPath = '/cajero';
+                                roleMessage = 'Será redirigido al panel de cajero...';
+                                break;
+                            case 'gerente':
+                            case 'admin':
+                                redirectPath = '/menu';
+                                roleMessage = 'Será redirigido al menú principal...';
+                                break;
+                            default:
+                                redirectPath = '/menu';
+                                roleMessage = 'Será redirigido al menú principal...';
+                                break;
+                        }
+                    }
+                    
+                    setSuccessMessage(roleMessage);
                     setShowSuccessModal(true);
                     setTimeout(() => {
                         setShowSuccessModal(false);
-                        navigate('/menu');
+                        navigate(redirectPath);
                     }, 2000);
                 } else {
                     setErrorMessage('Respuesta inesperada del servidor');
@@ -149,7 +179,7 @@ export default function FormLogin() {
                     <Modal>
                         <div className="flex flex-col items-center justify-center p-4">
                             <h2 className="text-xl font-bold mb-2 text-center">¡Inicio Exitoso!</h2>
-                            <p className="text-center">Será redirigido al menú principal...</p>
+                            <p className="text-center">{successMessage}</p>
                         </div>
                     </Modal>
                 )}
