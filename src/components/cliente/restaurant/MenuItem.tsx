@@ -1,6 +1,7 @@
 //Componente para mostrar informacion de un producto del menu del restaurante
 
 import { type MenuItem as MenuItemType } from "../shared/restaurant-types.ts";
+import { getImageUrl } from "../utils/imageUtils.ts";
 
 // MenuItemType define el tipo de un producto del menu que es MenuItem
 // onDetailsClick es una funcion que se ejecuta al hacer click en el boton de agregar
@@ -12,27 +13,6 @@ interface MenuItemProps {
 }
 
 export function MenuItem({ item, onDetailsClick }: MenuItemProps) {
-  // Función para obtener la URL de imagen pública de Google Drive
-  const getImageUrl = (imageRef: string) => {
-    if (!imageRef) return "";
-    
-    // Si es una URL completa de Google Drive, extraer el id
-    if (imageRef.includes('drive.usercontent.google.com') || imageRef.includes('drive.google.com')) {
-      const match = imageRef.match(/[?&]id=([^&]+)/);
-      if (match) {
-        const driveId = match[1];
-        return `https://corsproxy.io/?${encodeURIComponent(`https://drive.usercontent.google.com/download?id=${driveId}&authuser=0`)}`;
-      }
-    }
-    
-    // Si es una URL directa, usarla con proxy
-    if (imageRef.startsWith("http")) {
-      return `https://corsproxy.io/?${encodeURIComponent(imageRef)}`;
-    }
-    
-    return "";
-  };
-
   const imageUrl = getImageUrl(item.image || "");
 
   return (

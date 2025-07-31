@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { MenuItem, Complement, CartItem } from "../shared/restaurant-types.ts";
 
 export function useCart() {
@@ -83,23 +83,28 @@ export function useCart() {
     if (CART_KEY) localStorage.removeItem(CART_KEY);
   };
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  
+  // Memoización de cálculos para evitar recálculos innecesarios
+  const totalItems = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cart]);
+
   // Calcular subtotal incluyendo producto principal y complementos
-  const subtotal = cart.reduce((sum, item) => {
-    // Precio del producto principal
-    const productPrice = item.price * item.quantity;
-    
-    // Precio de los complementos seleccionados
-    const complementsPrice = (item.complements || [])
-      .filter((comp) => comp.selected)
-      .reduce((compSum, comp) => compSum + comp.price, 0) * item.quantity;
-    
-    return sum + productPrice + complementsPrice;
-  }, 0);
+  const subtotal = useMemo(() => {
+    return cart.reduce((sum, item) => {
+      // Precio del producto principal
+      const productPrice = item.price * item.quantity;
+      
+      // Precio de los complementos seleccionados
+      const complementsPrice = (item.complements || [])
+        .filter((comp) => comp.selected)
+        .reduce((compSum, comp) => compSum + comp.price, 0) * item.quantity;
+      
+      return sum + productPrice + complementsPrice;
+    }, 0);
+  }, [cart]);
   
-  const isv = subtotal * 0.15;
-  const totalPrice = subtotal + isv;
+  const isv = useMemo(() => subtotal * 0.15, [subtotal]);
+  const totalPrice = useMemo(() => subtotal + isv, [subtotal, isv]);
 
   return {
     cart,

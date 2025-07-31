@@ -1,26 +1,6 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import type { CartItem as CartItemType } from "../../cliente/shared/restaurant-types.ts";
-
-// Función para obtener la URL de imagen pública de Google Drive con proxy CORS
-const getImageUrl = (imageRef: string) => {
-  if (!imageRef) return "";
-  
-  // Si es una URL completa de Google Drive, extraer el id
-  if (imageRef.includes('drive.usercontent.google.com') || imageRef.includes('drive.google.com')) {
-    const match = imageRef.match(/[?&]id=([^&]+)/);
-    if (match) {
-      const driveId = match[1];
-      return `https://corsproxy.io/?${encodeURIComponent(`https://drive.usercontent.google.com/download?id=${driveId}&authuser=0`)}`;
-    }
-  }
-  
-  // Si es una URL directa, usarla con proxy
-  if (imageRef.startsWith("http")) {
-    return `https://corsproxy.io/?${encodeURIComponent(imageRef)}`;
-  }
-  
-  return "";
-};
+import { getImageUrl } from "../utils/imageUtils.ts";
 
 interface CartItemProps {
   item: CartItemType;
