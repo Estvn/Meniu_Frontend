@@ -41,15 +41,7 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
     }
   };
 
-  // const handleCancelOrder = async () => {
-  //   try {
-  //     await cancelarPedido(order.id_orden);
-  //     onCancelOrder?.(order.id_orden);
-  //   } catch (error) {
-  //     // Puedes mostrar un toast de error aquí si lo deseas
-  //     console.error("Error al cancelar el pedido", error);
-  //   }
-  // };
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleCancelOrder = () => {
@@ -82,7 +74,22 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
             Mesa {localStorage.getItem("num_mesa")}
           </p>
           <p className="text-sm text-gray-400 mt-1">
-            {new Date(order.fecha).toLocaleString()}
+            {(() => {
+              // Manejar diferentes formatos de fecha
+              let fechaFormateada = order.fecha;
+              
+              // Si la fecha contiene 'T', es formato ISO completo
+              if (order.fecha && order.fecha.includes('T')) {
+                const fecha = new Date(order.fecha);
+                fechaFormateada = fecha.toLocaleDateString('es-ES');
+              } else if (order.fecha) {
+                // Si es solo fecha (YYYY-MM-DD), formatear
+                const [year, month, day] = order.fecha.split('-');
+                fechaFormateada = `${day}/${month}/${year}`;
+              }
+              
+              return `${fechaFormateada}, ${order.hora_confirmacion}`;
+            })()}
           </p>
         </div>
         <div className="text-right">

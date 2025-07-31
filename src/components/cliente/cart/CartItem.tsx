@@ -1,6 +1,27 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import type { CartItem as CartItemType } from "../../cliente/shared/restaurant-types.ts";
 
+// Función para obtener la URL de imagen pública de Google Drive con proxy CORS
+const getImageUrl = (imageRef: string) => {
+  if (!imageRef) return "";
+  
+  // Si es una URL completa de Google Drive, extraer el id
+  if (imageRef.includes('drive.usercontent.google.com') || imageRef.includes('drive.google.com')) {
+    const match = imageRef.match(/[?&]id=([^&]+)/);
+    if (match) {
+      const driveId = match[1];
+      return `https://corsproxy.io/?${encodeURIComponent(`https://drive.usercontent.google.com/download?id=${driveId}&authuser=0`)}`;
+    }
+  }
+  
+  // Si es una URL directa, usarla con proxy
+  if (imageRef.startsWith("http")) {
+    return `https://corsproxy.io/?${encodeURIComponent(imageRef)}`;
+  }
+  
+  return "";
+};
+
 interface CartItemProps {
   item: CartItemType;
   onUpdateQuantity: (uid: string, newQuantity: number) => void;
@@ -8,21 +29,27 @@ interface CartItemProps {
 }
 
 export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
+  const imageUrl = getImageUrl(item.image || "");
+  
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 flex gap-4">
       {/* Imagen del producto */}
       <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 border border-gray-200">
-        {item.image ? (
+        {imageUrl ? (
           <img
-            src={item.image}
+            src={imageUrl}
             alt={item.name}
             className="w-full h-full object-cover rounded-lg"
+            onError={(e) => {
+              console.warn(`Error al cargar imagen para ${item.name}:`, e);
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
           />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-gray-400 rounded"></div>
-          </div>
-        )}
+        ) : null}
+        <div className={`w-full h-full flex items-center justify-center ${imageUrl ? 'hidden' : ''}`}>
+          <div className="w-8 h-8 border-2 border-gray-400 rounded"></div>
+        </div>
       </div>
 
       {/* Detalles del producto */}

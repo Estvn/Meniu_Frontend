@@ -29,8 +29,6 @@ export function useCart() {
       alert("No se ha seleccionado restaurante o mesa. No se puede agregar al carrito.");
       return;
     }
-    const complementsTotal = complements.reduce((sum, comp) => sum + comp.price, 0);
-    const totalPrice = item.price + complementsTotal;
 
     // Crear uid: combinación única por producto + complementos + instrucciones
     const complementIds = complements
@@ -55,7 +53,7 @@ export function useCart() {
         ...item,
         id: item.id, // número
         uid,         // cadena única solo para carrito
-        price: totalPrice,
+        price: item.price, // Solo el precio del producto principal, sin sumar complementos
         quantity,
         complements,
         instructions,
@@ -86,7 +84,20 @@ export function useCart() {
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+  // Calcular subtotal incluyendo producto principal y complementos
+  const subtotal = cart.reduce((sum, item) => {
+    // Precio del producto principal
+    const productPrice = item.price * item.quantity;
+    
+    // Precio de los complementos seleccionados
+    const complementsPrice = (item.complements || [])
+      .filter((comp) => comp.selected)
+      .reduce((compSum, comp) => compSum + comp.price, 0) * item.quantity;
+    
+    return sum + productPrice + complementsPrice;
+  }, 0);
+  
   const isv = subtotal * 0.15;
   const totalPrice = subtotal + isv;
 

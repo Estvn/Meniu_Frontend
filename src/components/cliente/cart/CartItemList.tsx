@@ -1,4 +1,4 @@
-import { CartItem as CartItemComponent } from "./CartItem";
+import { CartItem as CartItemComponent } from "./CartItem.tsx";
 import type { CartItem as CartItemType } from "../../cliente/shared/restaurant-types.ts";
 
 interface CartItemsListProps {

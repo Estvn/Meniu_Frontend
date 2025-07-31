@@ -1,5 +1,3 @@
-// src/routes/CartPageWrapper.tsx
-
 import CartPage from "../../../pages/cliente/CartPage.tsx";
 import { useCart } from "../hooks/useCart.ts";
 

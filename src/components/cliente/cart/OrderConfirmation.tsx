@@ -18,10 +18,19 @@ export function OrderConfirmationModal({
 }: OrderConfirmationModalProps) {
   if (!isOpen) return null;
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  // Calcular subtotal incluyendo producto principal y complementos
+  const subtotal = cart.reduce((sum, item) => {
+    // Precio del producto principal
+    const productPrice = item.price * item.quantity;
+    
+    // Precio de los complementos seleccionados
+    const complementsPrice = (item.complements || [])
+      .filter((comp) => comp.selected)
+      .reduce((compSum, comp) => compSum + comp.price, 0) * item.quantity;
+    
+    return sum + productPrice + complementsPrice;
+  }, 0);
+  
   const isv = subtotal * 0.15;
 
   return (
@@ -54,11 +63,37 @@ export function OrderConfirmationModal({
 
           <div className="space-y-2 mb-4">
             {cart.map((item) => (
-              <div key={item.id} className="flex justify-between text-sm">
-                <span>
-                  {item.quantity}x {item.name}
-                </span>
-                <span>L{(item.price * item.quantity).toFixed(2)}</span>
+              <div key={item.uid} className="space-y-1">
+                {/* Producto principal */}
+                <div className="flex justify-between text-sm">
+                  <span>
+                    {item.quantity}x {item.name}
+                  </span>
+                  <span>L{(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+                
+                {/* Complementos seleccionados */}
+                {item.complements && item.complements.filter(comp => comp.selected).length > 0 && (
+                  <div className="ml-4 space-y-1">
+                    {item.complements
+                      .filter(comp => comp.selected)
+                      .map((comp) => (
+                        <div key={comp.id} className="flex justify-between text-xs text-gray-600">
+                          <span>• {comp.name}</span>
+                          <span>+L{comp.price.toFixed(2)}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+                
+                {/* Instrucciones especiales */}
+                {item.instructions && item.instructions.trim() && (
+                  <div className="ml-4">
+                    <div className="text-xs text-gray-500 italic">
+                      Nota: {item.instructions}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

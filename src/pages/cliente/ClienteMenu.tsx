@@ -70,7 +70,18 @@ export default function ClienteMenu() {
   } = useMenuNavigation(menuCategories);
 
   if (loading) {
-    return <div className="p-4 text-center text-gray-500">Cargando menú...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <img 
+            src="../src/assets/img/logo.png" 
+            alt="Meniu Logo" 
+            className="w-48 h-auto mx-auto mb-4"
+          />
+          <p className="text-gray-500 text-lg">Cargando menú...</p>
+        </div>
+      </div>
+    );
   }
 
   // Se activa cuando el usuario hace clic en un elemento del menú y cambia la vista a producDetail
