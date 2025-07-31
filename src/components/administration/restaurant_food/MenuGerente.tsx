@@ -101,17 +101,25 @@ export function MenuGerente() {
     setProductoAccion(null);
   };
 
-  const handleSubmitFood = (data: FoodFormData) => {
-    if (editingFood) {
-      console.log("Actualizando alimento:", { ...data, id: editingFood.id_producto });
-      // Aquí iría la lógica para actualizar el alimento
-    } else {
-      console.log("Creando nuevo alimento:", data);
-      // Aquí iría la lógica para crear el alimento
+  const handleSubmitFood = (data: FoodFormData | { busqueda: string; producto: string; complemento: string }) => {
+    // Solo manejar el caso FoodFormData, ignorar el otro tipo
+    if ('name' in data && 'description' in data && 'price' in data && 'categoria' in data && 'subcategoria' in data && 'photo' in data) {
+      if (editingFood) {
+        console.log("Actualizando alimento:", { ...data, id: editingFood.id_producto });
+        // Aquí iría la lógica para actualizar el alimento
+      } else {
+        console.log("Creando nuevo alimento:", data);
+        // Aquí iría la lógica para crear el alimento
+      }
+      // Refrescar la lista de productos después de crear/editar
+      setRefreshTrigger(prev => prev + 1);
+      handleCloseForm();
     }
-    // Refrescar la lista de productos después de crear/editar
-    setRefreshTrigger(prev => prev + 1);
-    handleCloseForm();
+    // Si el tipo no es FoodFormData, no hacer nada
+    // Si es la respuesta de complemento, cerrar el formulario
+    if ('producto' in data && 'complemento' in data && 'busqueda' in data) {
+      handleCloseForm();
+    }
   };
 
   const handleConfirmToggleStatus = async () => {

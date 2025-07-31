@@ -6,6 +6,7 @@ import { TextareaField } from "./TextareaField";
 import { DropdownField } from "./DropdownField";
 import { FileUploadField } from "./FileUploadField";
 import { Button } from "./Button";
+import { FormularioAgregarComplemento } from "./FormularioAgregarComplemento";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import { obtenerCategorias } from "../../../endpoints/administration/categorias";
 import { crearProducto, actualizarProducto, type ActualizarProductoRequest } from "../../../endpoints/administration/productos";
@@ -14,7 +15,7 @@ import type { Categoria } from "../../../interfaces/Category";
 
 interface FormularioCrearAlimentoProps {
   onClose?: () => void;
-  onSubmit?: (data: FoodFormData) => void;
+  onSubmit?: (data: FoodFormData | { busqueda: string; producto: string; complemento: string }) => void;
   onCancel?: () => void;
   mode?: "create" | "edit";
   initialData?: FoodFormData;
@@ -118,6 +119,7 @@ export function FormularioCrearAlimento({
   productId,
   currentImageUrl,
 }: FormularioCrearAlimentoProps) {
+  const [formMode, setFormMode] = React.useState<"alimento" | "complemento">("alimento");
   const [categorias, setCategorias] = React.useState<Categoria[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -291,6 +293,10 @@ export function FormularioCrearAlimento({
     onCancel?.();
   };
 
+  const handleComplementoSubmit = (data: { busqueda: string; producto: string; complemento: string }) => {
+    onSubmit?.(data);
+  };
+
   // Obtener las opciones de categorías
   const categoriaOptions = [
     { value: "", label: "Seleccionar categoría" },
@@ -318,16 +324,39 @@ export function FormularioCrearAlimento({
 
   return (
     <Modal onClose={onClose}>
-      <FormProvider {...methods}>
-        <form
-          className="flex relative flex-col shrink-0 gap-3.5 items-start self-stretch"
-          onSubmit={handleSubmit}
-        >
-          <header className="flex relative flex-col items-start self-stretch">
-            <h1 className="relative text-base font-bold leading-6 text-gray-900 max-sm:text-sm">
-              {title}
-            </h1>
-          </header>
+      <div className="flex flex-col w-full max-w-md mx-auto">
+        {/* Botones de navegación */}
+        <div className="flex gap-1 mb-4 mt-12 pt-2">
+          <Button
+            variant={formMode === "alimento" ? "primary" : "secondary"}
+            onClick={() => setFormMode("alimento")}
+            type="button"
+            className="flex-1 text-xs py-0.5 px-2"
+          >
+            Agregar Alimento
+          </Button>
+          <Button
+            variant={formMode === "complemento" ? "primary" : "secondary"}
+            onClick={() => setFormMode("complemento")}
+            type="button"
+            className="flex-1 text-xs py-0.5 px-2"
+          >
+            Agregar Complemento
+          </Button>
+        </div>
+
+        {/* Contenido del formulario */}
+        {formMode === "alimento" ? (
+          <FormProvider {...methods}>
+            <form
+              className="flex relative flex-col shrink-0 gap-3.5 items-start self-stretch"
+              onSubmit={handleSubmit}
+            >
+              <header className="flex relative flex-col items-start self-stretch">
+                <h1 className="relative text-base font-bold leading-6 text-gray-900 max-sm:text-sm">
+                  {title}
+                </h1>
+              </header>
 
           {loading && (
             <div className="w-full text-center py-4">
@@ -439,6 +468,14 @@ export function FormularioCrearAlimento({
           
         </form>
       </FormProvider>
+        ) : (
+          <FormularioAgregarComplemento
+            onClose={onClose}
+            onSubmit={handleComplementoSubmit}
+            onCancel={onCancel}
+          />
+        )}
+      </div>
     </Modal>
   );
 }

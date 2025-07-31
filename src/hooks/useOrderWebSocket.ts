@@ -136,15 +136,15 @@ export function useOrderWebSocket<T = unknown>({ role, onNewOrder, onOrderStatus
       // Conexión exitosa
     });
 
-    socket.on('connect_error', (_error) => {
+    socket.on('connect_error', () => {
       // Error de conexión silenciado
     });
 
-    socket.on('disconnect', (_reason) => {
+    socket.on('disconnect', () => {
       // Desconexión silenciada
     });
 
-    socket.on('joined', (_room) => {
+    socket.on('joined', () => {
       // Unido a sala silenciado
     });
 
