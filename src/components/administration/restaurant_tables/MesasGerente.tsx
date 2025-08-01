@@ -137,7 +137,7 @@ export const MesasGerente = () => {
     console.log('🔍 handleViewQR - numero_mesa:', numero_mesa);
     
     if (restauranteId) {
-      const qrContent = `192.168.1.28:5173/cliente?id_restaurante=${restauranteId}&id_mesa=${id}&num_mesa=${numero_mesa}`;
+      const qrContent = `https://api-meniuapp-dev.azurewebsites.net/cliente?id_restaurante=${restauranteId}&id_mesa=${id}&num_mesa=${numero_mesa}`;
       console.log('🔍 handleViewQR - qrContent URL:', qrContent);
       setQrMesa({ id, qr_code: qrContent, numero_mesa });
     } else {
