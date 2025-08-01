@@ -32,7 +32,7 @@ const updateUser = async (userId: number, data: UpdateUserRequest | DeleteUserRe
 
   console.log('Updating user with data:', { userId, data });
 
-  const response = await fetch(`http://${BASE_URL}/usuarios/actualizar/${userId}`, {
+  const response = await fetch(`https://${BASE_URL}/usuarios/actualizar/${userId}`, {
     method: 'PUT',
     headers: {
       'accept': '*/*',

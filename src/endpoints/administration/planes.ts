@@ -6,7 +6,7 @@ const constValues = new ConstValues();
 const BASE_URL = constValues.app_server;
 
 const fetchPlanes = async (): Promise<Plan[]> => {
-  const response = await fetch(`http://${BASE_URL}/planes/todos`);
+  const response = await fetch(`https://${BASE_URL}/planes/todos`);
   if (!response.ok) {
     throw new Error('Error al obtener los planes de pago');
   }

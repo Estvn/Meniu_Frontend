@@ -25,7 +25,7 @@ export interface LoginResponse {
 }
 
 const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
-  const url = `http://${BASE_URL}/auth/login`;
+  const url = `https://${BASE_URL}/auth/login`;
   console.log('Making API call to:', url);
   console.log('With data:', data);
   

@@ -38,7 +38,7 @@ const postRegistroCliente = async (data: RegistroClienteRequest): Promise<Regist
     Object.entries(data).filter(([_, value]) => value !== undefined && value !== null)
   );
 
-  const response = await fetch(`http://${BASE_URL}/registro-clientes/registro-text`, {
+  const response = await fetch(`https://${BASE_URL}/registro-clientes/registro-text`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

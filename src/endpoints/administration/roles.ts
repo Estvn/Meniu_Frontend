@@ -19,7 +19,7 @@ const getRoles = async (): Promise<Role[]> => {
 
   console.log('Fetching roles with token:', token.substring(0, 20) + '...');
 
-  const response = await fetch(`http://${BASE_URL}/roles`, {
+  const response = await fetch(`https://${BASE_URL}/roles`, {
     method: 'GET',
     headers: {
       'accept': 'application/json',

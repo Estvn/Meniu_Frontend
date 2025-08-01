@@ -34,7 +34,7 @@ const createUser = async (data: CreateUserRequest): Promise<CreateUserResponse> 
 
   console.log('Creating user with data:', data);
 
-  const response = await fetch(`http://${BASE_URL}/personas/registrar`, {
+  const response = await fetch(`https://${BASE_URL}/personas/registrar`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

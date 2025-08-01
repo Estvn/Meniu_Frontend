@@ -15,7 +15,7 @@ const getUsers = async (): Promise<User[]> => {
 
   console.log('Fetching users with token:', token.substring(0, 20) + '...');
 
-  const response = await fetch(`http://${BASE_URL}/usuarios/todos`, {
+  const response = await fetch(`https://${BASE_URL}/usuarios/todos`, {
     method: 'GET',
     headers: {
       'accept': 'application/json',
