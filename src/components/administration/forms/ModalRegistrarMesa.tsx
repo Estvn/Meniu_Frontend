@@ -48,7 +48,7 @@ export function ModalRegistrarMesa({ onClose, onSubmit, onCancel }: ModalRegistr
         estado_mesa: 'Activa',
         qr_code: qrContent
       };
-      await fetch('http://localhost:3000/mesas/crear-mesa-ln', {
+      await fetch('https://api-meniuapp-dev.azurewebsites.net/mesas/crear-mesa-ln', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

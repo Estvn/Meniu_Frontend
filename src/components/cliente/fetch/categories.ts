@@ -1,6 +1,6 @@
 import type { MenuCategories, CategoriaBackend } from "../shared/restaurant-types.ts";
 
-//  Variable de entorno http://localhost:3000
+//  Variable de entorno https://api-meniuapp-dev.azurewebsites.net
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function fetchMenuCategories(): Promise<MenuCategories> {

@@ -1,6 +1,6 @@
 export default class ConstValues {
 
-    app_server:string = "localhost:3000";
+    app_server:string = "api-meniuapp-dev.azurewebsites.net/";
 }
 
 // Utility functions for session storage

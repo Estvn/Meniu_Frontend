@@ -34,7 +34,7 @@ export const MesasGerente = () => {
     }
     try {
       const token = sessionStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3000/mesas/restaurante-mesas', {
+      const res = await fetch('https://api-meniuapp-dev.azurewebsites.net/mesas/restaurante-mesas', {
         headers: {
           'accept': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -101,7 +101,7 @@ export const MesasGerente = () => {
       const actionText = actionType === 'activate' ? 'activada' : 'desactivada';
       
       const token = sessionStorage.getItem('access_token');
-      const response = await fetch(`http://localhost:3000/mesas/actualizar-mesa-ln/${mesaAEliminar}`, {
+      const response = await fetch(`https://api-meniuapp-dev.azurewebsites.net/mesas/actualizar-mesa-ln/${mesaAEliminar}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

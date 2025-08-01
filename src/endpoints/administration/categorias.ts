@@ -1,6 +1,6 @@
 import type { Categoria } from "../../interfaces/Category";
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "https://api-meniuapp-dev.azurewebsites.net";
 
 export const obtenerCategorias = async (): Promise<Categoria[]> => {
   try {

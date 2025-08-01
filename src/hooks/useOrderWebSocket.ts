@@ -120,7 +120,7 @@ export function useOrderWebSocket<T = unknown>({ role, onNewOrder, onOrderStatus
       return;
     }
 
-    const socket = io('http://localhost:3000', {
+    const socket = io('https://api-meniuapp-dev.azurewebsites.net', {
       query: {
         role,
         restauranteId: userData.restaurante_id,

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getStoredToken, getStoredUserData } from '../../assets/scripts/values/constValues';
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "https://api-meniuapp-dev.azurewebsites.net";
 
 // Tipos para las órdenes del backend
 export interface OrderItemResponse {
