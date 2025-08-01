@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "https://api-meniuapp-dev.azurewebsites.net";
 
 export interface Restaurante {
   id_restaurante: number;

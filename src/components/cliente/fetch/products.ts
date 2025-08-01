@@ -1,6 +1,6 @@
 import type { MenuItem, MenuCategories } from "../shared/restaurant-types.ts";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "https://api-meniuapp-dev.azurewebsites.net";
 
 interface ProductoAPI {
   id_producto: number;
@@ -79,7 +79,7 @@ export async function fetchMenuItems(restaurantId: number): Promise<MenuCategori
 }
 
 export async function fetchComplementos(productId: number) {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = "https://api-meniuapp-dev.azurewebsites.net";
   const response = await fetch(`${API_URL}/productos/complementos/${productId}`);
   if (!response.ok) {
     throw new Error('Error al obtener los complementos');
