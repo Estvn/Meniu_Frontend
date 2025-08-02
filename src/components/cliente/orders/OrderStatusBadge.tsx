@@ -17,6 +17,11 @@ export function OrderStatusBadge({estado}: OrderStatusBadgeProps) {
           label: "Preparando",
           className: "bg-orange-100 text-orange-800 border-orange-300",
         };
+      case "LISTO":
+        return {
+          label: "Listo",
+          className: "bg-emerald-100 text-emerald-800 border-emerald-300",
+        };
       case "ENTREGADA":
         return {
           label: "Entregada",

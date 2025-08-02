@@ -6,6 +6,7 @@ import {
   IceCream,
   HelpCircle,
   Sandwich,
+  Sparkles,
 } from "lucide-react";
 
 export interface CategoryStyle {
@@ -33,6 +34,6 @@ export const categoryMeta: Record<string, CategoryStyle> = {
 };
 
 export const defaultCategoryMeta: CategoryStyle = {
-  icon: <HelpCircle size={18} />,
+  icon: <Sparkles size={18} />,
   color: "bg-gray-100 text-gray-700",
 };

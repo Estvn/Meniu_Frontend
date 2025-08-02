@@ -30,8 +30,10 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
         return "Tu pedido está siendo procesado";
       case "PREPARANDO":
         return "El chef está preparando tu pedido";
-      case "ENTREGADA":
+      case "LISTO":
         return "¡Tu pedido está listo!";
+      case "ENTREGADA":
+        return "¡Tu pedido fue entregado!";
       case "CANCELADA":
         return "Este pedido fue cancelado";
       case "PAGADA":
