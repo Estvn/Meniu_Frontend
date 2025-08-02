@@ -32,7 +32,7 @@ export default defineConfig({
 				],
 				icons: [
 					{
-						src: './icons/logoHorizontal.png',
+						src: './icons/logo1.png',
 						sizes: '320x320',
 						type: 'image/png',
 					}]
