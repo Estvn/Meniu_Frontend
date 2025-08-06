@@ -91,7 +91,7 @@ export const PersonalGerente: React.FC = () => {
     createUser(userData, {
       onSuccess: (response) => {
         console.log("Usuario creado exitosamente:", response);
-        setSuccessMessage(`Usuario ${userData.nombre} ${userData.apellidos} creado exitosamente. Contraseña: ${response.user?.password || 'No disponible'}`);
+        setSuccessMessage(`Usuario creado: ${userData.nombre} ${userData.apellidos}.         Contraseña: ${response.password || 'No disponible'}`);
         setShowSuccessModal(true);
         setShowCrearUsuario(false);
         

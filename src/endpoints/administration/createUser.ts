@@ -23,6 +23,7 @@ export interface CreateUserResponse {
     email: string;
     password: string;
   };
+  password: string;
 }
 
 const createUser = async (data: CreateUserRequest): Promise<CreateUserResponse> => {
