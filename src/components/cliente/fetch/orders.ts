@@ -1,7 +1,8 @@
-// components/cliente/fetch/api/orders.ts
+//// components/cliente/fetch/api/orders.ts
 
 import type { CartItem } from "../shared/restaurant-types.ts";
 const API_URL ="https://api-meniuapp-dev.azurewebsites.net";
+//const API_URL = "http://localhost:3000";
 
 interface CreateOrderPayload {
   id_mesa: number;
@@ -29,20 +30,40 @@ export async function createOrder(
     })),
   };
 
-  const response = await fetch(`${API_URL}/orders/Crear`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  // Crear un AbortController para timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos de timeout
 
-  console.log("Payload que se enviará:", payload);
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Respuesta del backend:", errorText);
-    throw new Error("Error al crear el pedido");
+  try {
+    const response = await fetch(`${API_URL}/orders/Crear`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    console.log("Payload que se enviará:", payload);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Respuesta del backend:", errorText);
+      throw new Error(`Error al crear el pedido: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error("Tiempo de espera agotado. Por favor, intenta de nuevo.");
+      }
+      throw error;
+    }
+    
+    throw new Error("Error inesperado al crear el pedido");
   }
-
-  return await response.json();
 }
 
 export async function fetchOrderDetails(id_orden: number) {

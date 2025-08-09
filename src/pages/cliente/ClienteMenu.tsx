@@ -5,6 +5,7 @@ import { useMenuNavigation } from "../../components/cliente/hooks/useMenuNavigat
 import { useScrollToTop } from "../../components/cliente/hooks/useScrollToTop.ts";
 import { fetchMenuItems } from "../../components/cliente/fetch/products.ts";
 import { getRestaurantById } from "../../components/cliente/fetch/restaurant.ts"; 
+import { useActiveOrders } from "../../components/cliente/hooks/useActiveOrders.ts";
 
 
 import { Header } from "../../components/cliente/restaurant/MenuHeader.tsx";
@@ -35,6 +36,7 @@ export default function ClienteMenu() {
 
   const { addToCart, totalItems } = useCart();
   const { showScrollTop, scrollToTop } = useScrollToTop();
+  const { hasActiveOrders, hasOrdersWithCancelTime } = useActiveOrders();
 
   useEffect(() => {
   if (restauranteId && numeroMesa) {
@@ -113,7 +115,12 @@ export default function ClienteMenu() {
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {/* Header con el total de items en el carrito */}
-      <Header totalItems={totalItems} numeroMesa={numeroMesa} />
+      <Header 
+        totalItems={totalItems} 
+        numeroMesa={numeroMesa} 
+        hasActiveOrders={hasActiveOrders}
+        hasOrdersWithCancelTime={hasOrdersWithCancelTime}
+      />
       {restaurantInfo && <RestaurantInfo restaurant={restaurantInfo} />}
       <MenuNavigation />
 

@@ -4,7 +4,6 @@ import {
   Beer,
   UtensilsCrossed,
   IceCream,
-  HelpCircle,
   Sandwich,
   Sparkles,
 } from "lucide-react";

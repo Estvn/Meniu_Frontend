@@ -101,6 +101,7 @@ export function RequestBillModal({
     }
 
     console.log("IDs de las órdenes a consultar:", orderIds);
+    console.log("Mesa ID:", mesaId);
 
     // Consultar el backend para obtener el estado real de cada pedido
     const detalles = await Promise.all(orderIds.map((id: number) => fetchOrderDetails(id).catch(() => null)));
@@ -113,26 +114,41 @@ export function RequestBillModal({
       (order: BackendOrder | null) => order && order.estado === "ENTREGADA"
     ) as BackendOrder[];
 
+    console.log("Órdenes entregadas encontradas:", entregadas.map(o => ({ id: o.id_orden, estado: o.estado })));
+
     if (entregadas.length === 0) {
+      console.log("No hay pedidos entregados para solicitar pago");
       toast.error("No hay pedidos entregados para solicitar pago");
       onClose();
       return;
     }
 
     try {
+      console.log("Solicitando pago para órdenes:", entregadas.map(o => o.id_orden));
       await Promise.all(entregadas.map((order: BackendOrder) => solicitarPago(order.id_orden)));
       toast.success("¡Solicitud de pago enviada!", {
-      description: "El mesero se dirigirá a tu mesa para procesar el pago",
-      duration: 4000,
-      style: {
-        backgroundColor: "#10b981",
-        color: "white",
-        fontWeight: "500",
-      },
-    });
+        description: "El mesero se dirigirá a tu mesa para procesar el pago",
+        duration: 4000,
+        style: {
+          backgroundColor: "#10b981",
+          color: "white",
+          fontWeight: "500",
+        },
+      });
     } catch (error) {
       console.error("Error al solicitar el pago:", error);
-      toast.error("Error al solicitar el pago");
+      
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      
+      toast.error("Error al solicitar el pago", {
+        description: errorMessage,
+        duration: 5000,
+        style: {
+          backgroundColor: "#ef4444",
+          color: "white",
+          fontWeight: "500",
+        },
+      });
     }
     onClose();
   };

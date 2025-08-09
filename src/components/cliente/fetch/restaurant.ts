@@ -1,4 +1,5 @@
 const API_URL = "https://api-meniuapp-dev.azurewebsites.net";
+//const API_URL = "http://localhost:3000";
 
 export interface Restaurante {
   id_restaurante: number;

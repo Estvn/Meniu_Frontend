@@ -202,6 +202,59 @@ export default function MisPedidosPageWrapper() {
     }
   };
 
+  // Confirmar una orden pendiente inmediatamente
+  const handleConfirmOrder = async (orderId: number | undefined) => {
+    if (mesaId === null || orderId === undefined) return;
+
+    const key = `orders_mesa_${mesaId}`;
+    const localOrders: LocalOrder[] = JSON.parse(localStorage.getItem(key) || "[]");
+    
+    // Encontrar el pedido pendiente
+    const orderIndex = localOrders.findIndex((order) => 
+      order.id_orden === null && order.timestamp_creacion === orderId
+    );
+
+    if (orderIndex === -1) return;
+
+    const order = localOrders[orderIndex];
+    
+    try {
+      // Preparar cart para createOrder
+      const cart = order.items.map((item: LocalOrderItem) => ({
+        id: item.id_producto,
+        uid: `item-${item.id_producto}-${Date.now()}`,
+        name: item.nombre_producto,
+        description: item.nombre_producto,
+        price: item.precio_unitario,
+        quantity: item.cantidad,
+      }));
+
+      // Crear la orden en el backend
+      const nuevaOrden = await createOrder(
+        cart,
+        order.mesa.id_mesa,
+        order.restaurante.id_restaurante,
+        order.notas || ""
+      );
+
+      // Actualizar el pedido local con id_orden y estado PENDIENTE
+      localOrders[orderIndex] = {
+        ...order,
+        ...nuevaOrden,
+        estado: "PENDIENTE",
+        id_orden: nuevaOrden.id_orden,
+      };
+
+      // Guardar en localStorage y actualizar estado
+      localStorage.setItem(key, JSON.stringify(localOrders));
+      setOrders([...localOrders]);
+
+    } catch (error) {
+      console.error("Error al confirmar el pedido", error);
+      throw error; // Re-lanzar para que se maneje en el componente padre
+    }
+  };
+
   // Filtrar órdenes activas (no canceladas ni pagadas)
   const activeOrders = orders.filter(
     (order) => order.estado !== "CANCELADA" && order.estado !== "PAGADA"
@@ -214,6 +267,7 @@ export default function MisPedidosPageWrapper() {
     <MisPedidosPage
       orders={orders}
       onCancelOrder={handleCancelOrder}
+      onConfirmOrder={handleConfirmOrder}
       totalActiveAmount={totalActiveAmount}
       activeOrdersCount={activeOrdersCount}
       totalCartItems={totalItems}

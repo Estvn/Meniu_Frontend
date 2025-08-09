@@ -9,12 +9,14 @@ import { MenuNavigation } from "../../components/cliente/restaurant/MenuNavigati
 import { OrderSummary } from "../../components/cliente/orders/OrderSummary.tsx";
 import { OrderCard } from "../../components/cliente/orders/OrderCart.tsx";
 import { toast } from "sonner";
+import { useActiveOrders } from "../../components/cliente/hooks/useActiveOrders.ts";
 import type { Order } from "../../components/cliente/shared/order-types.ts";
 import type { Restaurante } from "../../components/cliente/shared/restaurant-types.ts";
 
 interface MisPedidosPageProps {
   orders: Order[];
   onCancelOrder: (orderId: number | undefined) => void;
+  onConfirmOrder: (orderId: number | undefined) => void;
   totalActiveAmount: number;
   activeOrdersCount: number;
   totalCartItems: number;
@@ -23,6 +25,7 @@ interface MisPedidosPageProps {
 export default function MisPedidosPage({
   orders,
   onCancelOrder,
+  onConfirmOrder,
   totalActiveAmount,
   activeOrdersCount,
   totalCartItems,
@@ -33,6 +36,7 @@ export default function MisPedidosPage({
   const restauranteId = localStorage.getItem("id_restaurante");
   const mesaId = localStorage.getItem("id_mesa");
   const numMesa = localStorage.getItem("num_mesa");
+  const { hasActiveOrders, hasOrdersWithCancelTime } = useActiveOrders();
 
   const { showScrollTop, scrollToTop } = useScrollToTop();
 
@@ -66,15 +70,45 @@ export default function MisPedidosPage({
     });
   };
 
-  // Calcular si hay pedidos activos (PENDIENTE, PREPARANDO o LISTO)
-  const hasActiveOrders = orders.some(
-    (order) => order.estado === "PENDIENTE" || order.estado === "PREPARANDO" || order.estado === "ENTREGADA"
-  );
+  const handleConfirmOrder = async (orderId: number | undefined) => {
+    try {
+      await onConfirmOrder(orderId);
+
+      toast.success("Pedido confirmado", {
+        description: "Tu pedido ha sido enviado a la cocina",
+        duration: 3000,
+        style: {
+          backgroundColor: "#10b981",
+          color: "white",
+          fontWeight: "500",
+        },
+      });
+    } catch (error) {
+      console.error("Error al confirmar pedido:", error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      
+      toast.error("Error al confirmar pedido", {
+        description: errorMessage,
+        duration: 5000,
+        style: {
+          backgroundColor: "#ef4444",
+          color: "white",
+          fontWeight: "500",
+        },
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {numeroMesa !== null && (
-        <Header totalItems={totalCartItems} numeroMesa={numeroMesa} hasActiveOrders={hasActiveOrders} />
+        <Header 
+          totalItems={totalCartItems} 
+          numeroMesa={numeroMesa} 
+          hasActiveOrders={hasActiveOrders}
+          hasOrdersWithCancelTime={hasOrdersWithCancelTime}
+        />
       )}
       {restaurante && <RestaurantInfo restaurant={restaurante} />}
       <MenuNavigation />
@@ -97,6 +131,7 @@ export default function MisPedidosPage({
                 key={order.id_orden ?? order.timestamp_creacion}
               order={order}
                 onCancelOrder={cancelId !== undefined ? () => handleCancelOrder(cancelId) : undefined}
+                onConfirmOrder={cancelId !== undefined ? () => handleConfirmOrder(cancelId) : undefined}
             />
             );
           })}
