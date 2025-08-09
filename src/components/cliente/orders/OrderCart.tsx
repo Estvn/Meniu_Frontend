@@ -8,9 +8,10 @@ import { Modal } from "../../administration/forms/Modal";
 interface OrderCardProps {
   order: Order;
   onCancelOrder?: (orderId: number) => void;
+  onConfirmOrder?: (orderId: number) => void;
 }
 
-export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
+export function OrderCard({ order, onCancelOrder, onConfirmOrder }: OrderCardProps) {
   // Calcular tiempo restante real para pedidos pendientes
   const totalSeconds = order.timestamp_creacion && order.estimateTime
     ? Math.floor((order.estimateTime - order.timestamp_creacion) / 1000)
@@ -30,8 +31,10 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
         return "Tu pedido está siendo procesado";
       case "PREPARANDO":
         return "El chef está preparando tu pedido";
-      case "ENTREGADA":
+      case "LISTO":
         return "¡Tu pedido está listo!";
+      case "ENTREGADA":
+        return "¡Tu pedido fue entregado!";
       case "CANCELADA":
         return "Este pedido fue cancelado";
       case "PAGADA":
@@ -43,9 +46,15 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
 
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showConfirmOrderModal, setShowConfirmOrderModal] = useState(false);
+  const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
 
   const handleCancelOrder = () => {
     setShowConfirmModal(true);
+  };
+
+  const handleConfirmOrder = () => {
+    setShowConfirmOrderModal(true);
   };
 
   const handleConfirmCancel = () => {
@@ -58,8 +67,30 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
     }
   };
 
+  const handleConfirmOrderSubmit = async () => {
+    setShowConfirmOrderModal(false);
+    setIsConfirmingOrder(true);
+    
+    try {
+      const confirmId = order.id_orden !== null && order.id_orden !== undefined
+        ? order.id_orden
+        : (order.timestamp_creacion !== undefined ? order.timestamp_creacion : undefined);
+      if (typeof confirmId === 'number') {
+        await onConfirmOrder?.(confirmId);
+      }
+    } catch (error) {
+      console.error("Error al confirmar el pedido:", error);
+    } finally {
+      setIsConfirmingOrder(false);
+    }
+  };
+
   const handleCloseModal = () => {
     setShowConfirmModal(false);
+  };
+
+  const handleCloseConfirmOrderModal = () => {
+    setShowConfirmOrderModal(false);
   };
 
   return (
@@ -145,12 +176,37 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
             <span className="w-2 h-2 bg-orange-500 rounded-full mr-2 animate-pulse" />
             Tiempo para cancelar: {timeLeft}
           </div>
-          <button
-            onClick={handleCancelOrder}
-            className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
-          >
-            Cancelar
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleConfirmOrder}
+              disabled={isConfirmingOrder}
+              className={`px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors ${
+                isConfirmingOrder 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-green-500 hover:bg-green-600'
+              }`}
+            >
+              {isConfirmingOrder ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Enviando...
+                </div>
+              ) : (
+                'Pedir'
+              )}
+            </button>
+            <button
+              onClick={handleCancelOrder}
+              disabled={isConfirmingOrder}
+              className={`px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors ${
+                isConfirmingOrder 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-red-500 hover:bg-red-600'
+              }`}
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
 
@@ -174,6 +230,32 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
                 type="button"
               >
                 Sí, cancelar
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Modal de confirmación de pedido */}
+      {showConfirmOrderModal && (
+        <Modal onClose={handleCloseConfirmOrderModal}>
+          <div className="flex flex-col gap-4 w-full">
+            <h2 className="text-lg font-bold text-gray-900">¿Confirmar pedido?</h2>
+            <p className="text-gray-700">¿Estás seguro de que deseas confirmar este pedido? Se enviará inmediatamente a la cocina y no podrás cancelarlo.</p>
+            <div className="flex gap-2 justify-end w-full pt-2">
+              <button
+                onClick={handleCloseConfirmOrderModal}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                type="button"
+              >
+                No, esperar
+              </button>
+              <button
+                onClick={handleConfirmOrderSubmit}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                type="button"
+              >
+                Sí, confirmar
               </button>
             </div>
           </div>
